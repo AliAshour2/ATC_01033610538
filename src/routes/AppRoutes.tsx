@@ -2,6 +2,8 @@ import AuthGuard from "@/components/auth/AuthGuard";
 import AdminLayout from "@/components/layout/AdminLayout";
 import MainLayout from "@/components/layout/MainLayout";
 import AdminDashboard from "@/pages/admin/AdminDashboard";
+import LoginPage from "@/pages/auth/LoginPage";
+import RegisterPage from "@/pages/auth/RegisterPage";
 import { UserRole } from "@/types";
 import { Routes, Route } from "react-router";
 
@@ -9,7 +11,12 @@ const AppRoutes = () => {
   return (
     <Routes>
       {/* Public Routes */}
-      <Route path="/" element={<MainLayout />} />
+      <Route path="/" element={<MainLayout />} >
+      
+
+      <Route path="/login" element={<LoginPage/>} />
+      <Route path="/register" element={<RegisterPage/>} />
+      </Route>
 
       {/* Admin Layout Protected Route */}
       <Route

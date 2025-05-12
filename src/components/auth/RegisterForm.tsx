@@ -17,6 +17,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import toast from "react-hot-toast";
 import { useRegisterMutation } from "@/features/auth/authApi";
+import { useNavigate } from "react-router";
 
 const formSchema = z.object({
   name: z.string().min(2, { message: "Name must be at least 2 characters" }),
@@ -32,7 +33,7 @@ const formSchema = z.object({
 });
 
 export default function RegisterForm() {
-//   const navigate = useNavigate();
+  const navigate = useNavigate();
   const [register, { isLoading }] = useRegisterMutation();
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -54,7 +55,7 @@ export default function RegisterForm() {
       }).unwrap();
       
       toast.success("You've successfully registered! Please log in.");
-    //   navigate("/login");
+      navigate("/login");
     } catch (error) {
       toast.error("There was an error creating your account.");
       console.error("Registration error:", error);
@@ -136,14 +137,14 @@ export default function RegisterForm() {
         <CardFooter className="flex justify-center">
           <div className="text-sm">
             Already have an account?{" "}
-            {/* <Button 
+            <Button 
               variant="link" 
               className="p-0" 
               onClick={() => navigate("/login")}
               disabled={isLoading}
             >
               Login
-            </Button> */}
+            </Button>
           </div>
         </CardFooter>
       </Card>

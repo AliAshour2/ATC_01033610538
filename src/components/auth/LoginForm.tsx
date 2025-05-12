@@ -13,7 +13,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 
 import { useForm } from "react-hook-form";
 import { Button } from "../ui/button";
-// import { useNavigate } from "react-router"
+import { useNavigate } from "react-router"
 import toast, { Toaster } from "react-hot-toast";
 import { useLoginMutation } from "@/features/auth/authApi";
 
@@ -23,7 +23,7 @@ const formSchema = z.object({
 });
 
 export function LoginForm() {
-    // const navigate = useNavigate();
+    const navigate = useNavigate();
   const [login, { isLoading }] = useLoginMutation();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -38,14 +38,15 @@ export function LoginForm() {
       await login(values).unwrap();
 
       toast.success("Logged in successfully");
-    //   navigate("/");
+      navigate("/");
     } catch (error) {
       toast.error("Failed to login");
     }
   };
 
   return (
-    <Form {...form}>
+    <div className ="w-full max-w-md mx-auto">
+      <Form {...form} >
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
         <FormField
           control={form.control}
@@ -78,5 +79,6 @@ export function LoginForm() {
         </Button>
       </form>
     </Form>
+    </div>
   );
 }
