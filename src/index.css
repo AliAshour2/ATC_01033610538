@@ -1,2 +1,86 @@
 @import "tailwindcss";
 @import "tw-animate-css";
+
+
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 260 10% 8%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 260 10% 8%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 260 10% 8%;
+
+    --primary: 270 64% 40%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 180 64% 36%;
+    --secondary-foreground: 0 0% 100%;
+
+    --accent: 15 90% 65%;
+    --accent-foreground: 0 0% 100%;
+
+    --muted: 260 10% 96%;
+    --muted-foreground: 260 10% 50%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 260 10% 92%;
+    --input: 260 10% 92%;
+    --ring: 260 64% 40%;
+
+    --radius: 0.75rem;
+
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 240 5.3% 26.1%;
+    --sidebar-primary: 240 5.9% 10%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 240 4.8% 95.9%;
+    --sidebar-accent-foreground: 240 5.9% 10%;
+    --sidebar-border: 220 13% 91%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+
+  .dark {
+    --background: 260 10% 4%;
+    --foreground: 0 0% 96%;
+
+    --card: 260 10% 8%;
+    --card-foreground: 0 0% 96%;
+
+    --popover: 260 10% 8%;
+    --popover-foreground: 0 0% 96%;
+
+    --primary: 270 64% 50%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 180 64% 36%;
+    --secondary-foreground: 0 0% 100%;
+
+    --accent: 15 90% 65%;
+    --accent-foreground: 0 0% 100%;
+
+    --muted: 260 10% 16%;
+    --muted-foreground: 260 10% 70%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 260 10% 20%;
+    --input: 260 10% 20%;
+    --ring: 270 64% 50%;
+
+    --sidebar-background: 260 10% 8%;
+    --sidebar-foreground: 0 0% 96%;
+    --sidebar-primary: 270 64% 50%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 260 10% 12%;
+    --sidebar-accent-foreground: 0 0% 96%;
+    --sidebar-border: 260 10% 20%;
+    --sidebar-ring: 270 64% 50%;
+  }
+}

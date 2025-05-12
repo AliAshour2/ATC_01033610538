@@ -1,14 +1,16 @@
-import { BrowserRouter , Route, Routes } from "react-router"
-import MainLayout from "./components/layout/MainLayout"
+import { Provider } from "react-redux";
+import { BrowserRouter } from "react-router";
+import AppRoutes from "./routes/AppRoutes";
+import store from "./app/store";
 
 function App() {
- 
   return (
-    <div className="bg-green-200">
-
-    </div>
-  )
+    <BrowserRouter>
+      <Provider store={store}>
+        <AppRoutes />
+      </Provider>
+    </BrowserRouter>
+  );
 }
 
-export default App
-
+export default App;
