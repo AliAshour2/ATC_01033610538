@@ -4,17 +4,11 @@ import MainLayout from "./components/layout/MainLayout"
 function App() {
  
   return (
-    <>
-      <BrowserRouter>
-        <Routes>
-          {/* MainLayout */}
-          <Route element={<MainLayout />}>
+    <div className="bg-green-200">
 
-          </Route>
-        </Routes>
-      </BrowserRouter>
-    </>
+    </div>
   )
 }
 
 export default App
+
