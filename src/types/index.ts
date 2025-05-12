@@ -12,3 +12,10 @@ export interface User {
   phoneNumber?: string;
   organization?: string;
 }
+
+
+export interface AuthState {
+    user : User | null; 
+    loading : boolean ;
+    error : string |null ;
+}

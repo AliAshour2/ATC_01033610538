@@ -10,11 +10,10 @@ import {
   signOut,
   updateProfile,
 } from "@firebase/auth";
-import { createApi, fakeBaseQuery } from "@reduxjs/toolkit/query";
+import { createApi, fakeBaseQuery } from "@reduxjs/toolkit/query/react";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import { auth, db } from "@/lib/firebase";
 import { handleError } from "@/helpers/handleError";
-
 
 export const authApi = createApi({
   reducerPath: "authApi",
@@ -53,13 +52,14 @@ export const authApi = createApi({
     login: builder.mutation<User, { email: string; password: string }>({
       async queryFn({ email, password }) {
         try {
+          await setPersistence(auth, browserLocalPersistence);
           const userCredential = await signInWithEmailAndPassword(
             auth,
             email,
             password
           );
 
-          await setPersistence(auth, browserLocalPersistence);
+          
 
           // Fetch additional user data from Firestore
           const userDoc = await getDoc(
@@ -178,3 +178,14 @@ export const authApi = createApi({
     }),
   }),
 });
+
+export const {
+  useRegisterMutation,
+  useLoginMutation,
+  useLogoutMutation,
+  useForgotPasswordMutation,
+  useResetPasswordMutation,
+  useVerifyEmailMutation,
+  useUpdateProfileMutation,
+  useGetAuthStateQuery,
+} = authApi;
