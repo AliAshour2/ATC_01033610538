@@ -19,3 +19,25 @@ export interface AuthState {
     loading : boolean ;
     error : string |null ;
 }
+
+export type Event = {
+  id: string;
+  title: string;
+  description: string;
+  date: string;
+  location: string;
+  capacity: number;
+  price: number;
+  organizerId: string;
+  imageUrl?: string;
+  category?: string;
+  tags?: string[];
+  venue?: string;
+};
+export interface EventFilters {
+  search?: string;
+  category?: string;
+  tags?: string[];
+  dateFrom?: string;
+  dateTo?: string;
+}

@@ -9,6 +9,7 @@ import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import type { ReactNode } from "react";
 import { formatDate } from "@/utils/utils";
 import { Badge } from "../ui/badge";
+import type { Event } from "@/types";
 
 
 
@@ -26,7 +27,7 @@ function EventCardRoot({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3, delay: index * 0.05 }}
     >
-      <Card className="overflow-hidden card-hover">{children}</Card>
+      <Card className="pt-0 overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1">{children}</Card>
     </motion.div>
   );
 }

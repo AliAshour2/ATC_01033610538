@@ -139,9 +139,18 @@ export const bookingApi = createApi({
       invalidatesTags: ['Booking'],
     }),
 
+    deleteBooking: builder.mutation<void, string>({
+      async queryFn(id) {
+        try {
+          const docRef = doc(db, 'bookings', id);
+          await deleteDoc(docRef);
+          return { data: undefined };
+        } catch (error) {
+          return handleError(error);
+        }
+      },
+      invalidatesTags: ['Booking'],
+  }),
     
-
-
-
   }),
 });

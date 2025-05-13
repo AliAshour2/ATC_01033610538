@@ -4,6 +4,7 @@ import MainLayout from "@/components/layout/MainLayout";
 import AdminDashboard from "@/pages/admin/AdminDashboard";
 import LoginPage from "@/pages/auth/LoginPage";
 import RegisterPage from "@/pages/auth/RegisterPage";
+import HomePage from "@/pages/home/HomePage";
 import { UserRole } from "@/types";
 import { Routes, Route } from "react-router";
 
@@ -12,10 +13,11 @@ const AppRoutes = () => {
     <Routes>
       {/* Public Routes */}
       <Route path="/" element={<MainLayout />} >
-      
+      <Route index element={<HomePage />} />
 
       <Route path="/login" element={<LoginPage/>} />
       <Route path="/register" element={<RegisterPage/>} />
+
       </Route>
 
       {/* Admin Layout Protected Route */}
