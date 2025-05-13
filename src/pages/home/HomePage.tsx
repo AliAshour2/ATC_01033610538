@@ -7,9 +7,9 @@ import { useState, useMemo, useCallback } from "react";
 
 const HomePage = () => {
   const [filters, setFilters] = useState<EventFilters>({});
-  const { data: events, isLoading, error, isFetching } = useGetEventsQuery(filters);
+  const { data: events, isLoading , error, isFetching } = useGetEventsQuery(filters);
 
-  // Extract unique categories and tags from events
+  
   const { categories, tags } = useMemo(() => {
     if (!events) return { categories: [], tags: [] };
     

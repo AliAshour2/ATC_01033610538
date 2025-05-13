@@ -24,70 +24,73 @@ export const eventApi = createApi({
   reducerPath: "eventApi",
   baseQuery: fakeBaseQuery(),
   tagTypes: ["Event"],
-  endpoints: (builder) => ({
-    getEvents: builder.query<Event[], EventFilters | void>({
+  endpoints: (builder) => ({    getEvents: builder.query<Event[], EventFilters | void>({
       async queryFn(filters: EventFilters = {}) {
         try {
           const eventsRef = collection(db, "events");
-          
-          // Start with base query
-          let baseQuery = query(eventsRef, orderBy("date", "asc"));
-          
-          // Build composite queries if filters are present
-          if (filters.category || filters.tags?.length || filters.dateFrom || filters.dateTo) {
-            const conditions = [];
-
-            if (filters.category) {
-              conditions.push(where("category", "==", filters.category));
-            }
-
-            if (filters.tags && filters.tags.length > 0) {
-              // Firestore only supports one array-contains-any per query
-              conditions.push(where("tags", "array-contains-any", filters.tags.slice(0, 10)));
-            }
-
-            if (filters.dateFrom) {
-              const fromDate = new Date(filters.dateFrom);
-              fromDate.setHours(0, 0, 0, 0);
-              conditions.push(where("date", ">=", Timestamp.fromDate(fromDate)));
-            }
-
-            if (filters.dateTo) {
-              const toDate = new Date(filters.dateTo);
-              toDate.setHours(23, 59, 59, 999);
-              conditions.push(where("date", "<=", Timestamp.fromDate(toDate)));
-            }
-
-            baseQuery = query(eventsRef, ...conditions, orderBy("date", "asc"));
+          const queryConstraints = [];          // Add category filter (if not 'all' and defined)
+          if (filters.category && filters.category !== 'all') {
+            queryConstraints.push(where("category", "==", filters.category));
           }
 
-          const querySnapshot = await getDocs(baseQuery);
-          let events = querySnapshot.docs.map((doc) => {
-            const data = doc.data();
-            return {
-              id: doc.id,
-              ...data,
-              date: data.date.toDate().toISOString(),
-              // Ensure venue is properly mapped from location if needed
-              venue: data.venue || data.location,
-            } as Event;
-          });
-
-          // Apply search filter client-side (Firestore doesn't support full-text search natively)
-          if (filters.search) {
-            const term = filters.search.toLowerCase();
-            events = events.filter((event) =>
-              event.title.toLowerCase().includes(term) || 
-              event.description.toLowerCase().includes(term) ||
-              event.venue?.toLowerCase().includes(term) ||
-              event.category?.toLowerCase().includes(term)
-            );
+          // Handle tags filter
+          if (filters.tags && filters.tags.length > 0) {
+            queryConstraints.push(where("tags", "array-contains-any", filters.tags.slice(0, 10)));
           }
 
-          // Sort events by date
-          events.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+          // Add date filters
+          if (filters.dateFrom) {
+            const fromDate = new Date(filters.dateFrom);
+            fromDate.setHours(0, 0, 0, 0);
+            queryConstraints.push(where("date", ">=", Timestamp.fromDate(fromDate)));
+          }
 
-          return { data: events };
+          if (filters.dateTo) {
+            const toDate = new Date(filters.dateTo);
+            toDate.setHours(23, 59, 59, 999);
+            queryConstraints.push(where("date", "<=", Timestamp.fromDate(toDate)));
+          }
+
+          // Add orderBy constraint last
+          queryConstraints.push(orderBy("date", "asc"));
+
+          // Create the query with all constraints
+          const baseQuery = query(eventsRef, ...queryConstraints);          try {
+            const querySnapshot = await getDocs(baseQuery);
+            let events = querySnapshot.docs.map((doc) => {
+              const data = doc.data();              return {
+                id: doc.id,
+                title: data.title || '',
+                description: data.description || '',
+                date: data.date?.toDate()?.toISOString() || new Date().toISOString(),
+                venue: data.venue || data.location || '',
+                category: data.category || '',
+                tags: Array.isArray(data.tags) ? data.tags : [],
+                imageUrl: data.imageUrl || '/placeholder.jpg',
+                price: Number(data.price) || 0,
+                capacity: Number(data.capacity) || 0,
+              } as Event;
+            });
+
+            // Apply search filter client-side
+            if (filters.search) {
+              const term = filters.search.toLowerCase();
+              events = events.filter((event) =>
+                event.title.toLowerCase().includes(term) || 
+                event.description.toLowerCase().includes(term) ||
+                (event.venue ?? '').toLowerCase().includes(term) ||
+                (event.category ?? '').toLowerCase().includes(term)
+              );
+            }
+
+            // Ensure events are sorted by date
+            events.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+
+            return { data: events };
+          } catch (queryError) {
+            console.error('Error executing query:', queryError);
+            return handleError(queryError);
+          }
         } catch (error) {
           return handleError(error);
         }

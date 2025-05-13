@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Search, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -44,10 +43,13 @@ export default function EventsFilter({ categories, tags, onFilterChange }: Event
     if (e.key === "Enter") {
       handleSearch();
     }
-  };
-
-  const handleCategoryChange = (category: string) => {
-    const newFilters = { ...filters, category: category === "all" ? undefined : category };
+  };  const handleCategoryChange = (category: string) => {
+    const newFilters = category === "all" 
+      ? { ...filters, category: undefined }
+      : { ...filters, category };
+    
+    
+    
     setFilters(newFilters);
     onFilterChange(newFilters);
   };
