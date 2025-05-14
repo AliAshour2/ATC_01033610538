@@ -1,9 +1,11 @@
 import AuthGuard from "@/components/auth/AuthGuard";
+import BookingConfirmation from "@/components/booking/BookingConfirmation";
 import AdminLayout from "@/components/layout/AdminLayout";
 import MainLayout from "@/components/layout/MainLayout";
 import AdminDashboard from "@/pages/admin/AdminDashboard";
 import LoginPage from "@/pages/auth/LoginPage";
 import RegisterPage from "@/pages/auth/RegisterPage";
+import BookingsPage from "@/pages/booking/BookingsPage";
 import EventDetails from "@/pages/event/EventDetails";
 import HomePage from "@/pages/home/HomePage";
 import { UserRole } from "@/types";
@@ -13,13 +15,28 @@ const AppRoutes = () => {
   return (
     <Routes>
       {/* Public Routes */}
-      <Route path="/" element={<MainLayout />} >
-      <Route index element={<HomePage />} />
+      <Route path="/" element={<MainLayout />}>
+        <Route index element={<HomePage />} />
 
-      <Route path="/login" element={<LoginPage/>} />
-      <Route path="/register" element={<RegisterPage/>} />
-      <Route path="/events/:eventId" element={<EventDetails/>}/>
-
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/register" element={<RegisterPage />} />
+        <Route path="/events/:eventId" element={<EventDetails />} />
+        <Route
+          path="booking-confirmation/:eventId"
+          element={
+            <AuthGuard>
+              <BookingConfirmation />
+            </AuthGuard>
+          }
+        />
+        <Route
+          path="/bookings"
+          element={
+            <AuthGuard>
+              <BookingsPage />
+            </AuthGuard>
+          }
+        />
       </Route>
 
       {/* Admin Layout Protected Route */}

@@ -12,7 +12,6 @@ import EventDetailsSkeleton from "@/components/skeletons/EventDetialsPageSkeleto
 import toast from "react-hot-toast";
 import { useState } from "react";
 import {
-  bookingApi,
   useCreateBookingMutation,
   useGetUserBookingsQuery,
   type Booking,
@@ -24,6 +23,7 @@ const EventDetails = () => {
   const { data: authState } = useGetAuthStateQuery();
   const navigate = useNavigate();
   const [isBooking, setIsBooking] = useState(false);
+  const [quantity, setQuantity] = useState(1);
 
   // Get user's bookings if authenticated
   const { data: userBookings } = useGetUserBookingsQuery(authState?.id || "", {
@@ -59,6 +59,8 @@ const EventDetails = () => {
   }
 
   const eventDate = new Date(event.date);
+  const formattedDate = format(eventDate, "EEEE, MMMM d, yyyy");
+  const formattedTime = format(eventDate, "h:mm a");
 
   const handleBookEvent = async () => {
     // Check if user is authenticated
@@ -70,16 +72,18 @@ const EventDetails = () => {
 
     try {
       setIsBooking(true);
-
       // Create booking request
-      await createBooking({
+      const result = await createBooking({
         eventId: eventId as string,
         userId: authState.id,
-        quantity: 1, // Default to 1 ticket
-        totalPrice: event.price,
+        quantity,
+        totalPrice: event.price * quantity,
       }).unwrap();
 
-      toast.success("You have successfully booked this event!");
+      // Navigate to booking confirmation page with booking data
+      navigate(`/booking-confirmation/${eventId}`, { 
+        state: { booking: result } 
+      });
     } catch (error) {
       console.error("Booking failed:", error);
       toast.error(
@@ -171,13 +175,39 @@ const EventDetails = () => {
               <div className="text-muted-foreground">per ticket</div>
             </div>
 
+            {/* Add quantity selector */}
+            {!isBooked && (
+              <div className="mb-6">
+                <label
+                  htmlFor="quantity"
+                  className="block text-sm font-medium mb-2"
+                >
+                  Number of Tickets
+                </label>
+                <select
+                  id="quantity"
+                  value={quantity}
+                  onChange={(e) => setQuantity(Number(e.target.value))}
+                  className="w-full rounded-md border border-gray-300 bg-background px-3 py-2"
+                  disabled={isBooking}
+                >
+                  {[1, 2, 3, 4, 5].map((num) => (
+                    <option key={num} value={num}>
+                      {num} {num === 1 ? "ticket" : "tickets"} ($
+                      {(event.price * num).toFixed(2)})
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+
             <div className="space-y-4 mb-6">
               <div className="flex items-center">
                 <Calendar className="mr-2 h-4 w-4 text-muted-foreground" />
                 <div>
                   <div className="font-medium">Date and Time</div>
                   <div className="text-sm text-muted-foreground">
-                    {format(eventDate, "EEEE, MMMM d, yyyy")}
+                    {formattedDate} at {formattedTime}
                   </div>
                 </div>
               </div>
@@ -211,7 +241,11 @@ const EventDetails = () => {
                 onClick={handleBookEvent}
                 disabled={isBooking}
               >
-                {isBooking ? "Booking..." : "Book Now"}
+                {isBooking
+                  ? "Booking..."
+                  : `Book ${quantity > 1 ? quantity + " tickets" : "Now"} - $${(
+                      event.price * quantity
+                    ).toFixed(2)}`}
               </Button>
             )}
 
