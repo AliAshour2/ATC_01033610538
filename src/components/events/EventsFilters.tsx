@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState} from "react";
 import { Search, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
@@ -35,68 +35,99 @@ export default function EventsFilter({ categories, tags, onFilterChange }: Event
   const [dateFrom, setDateFrom] = useState<Date | undefined>(undefined);
   const [dateTo, setDateTo] = useState<Date | undefined>(undefined);
 
+
+
   const handleSearch = () => {
-    onFilterChange({ ...filters, search: searchTerm });
+    const newFilters = { ...filters, search: searchTerm || undefined };
+    setFilters(newFilters);
+    onFilterChange(newFilters);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
       handleSearch();
     }
-  };  const handleCategoryChange = (category: string) => {
-    const newFilters = category === "all" 
-      ? { ...filters, category: undefined }
-      : { ...filters, category };
+  };
+
+  const handleCategoryChange = (category: string) => {
     
+    // Create new filters object based on selected category
+    const newFilters = { ...filters };
     
-    
+    if (category === "all") {
+      // Remove category filter if "all" is selected
+      if (newFilters.category) {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const { category: _, ...rest } = newFilters;
+        setFilters(rest);
+        onFilterChange(rest);
+        return;
+      }
+    } else {
+      // Add category filter
+      newFilters.category = category;
+    }
     setFilters(newFilters);
     onFilterChange(newFilters);
   };
 
   const handleTagToggle = (tag: string) => {
     let newTags: string[];
+    
     if (selectedTags.includes(tag)) {
       newTags = selectedTags.filter((t) => t !== tag);
     } else {
       newTags = [...selectedTags, tag];
     }
+    
     setSelectedTags(newTags);
     
-    const newFilters = { ...filters, tags: newTags.length > 0 ? newTags : undefined };
-    setFilters(newFilters);
-    onFilterChange(newFilters);
+    // Update filters object with new tags or remove tags property if empty
+    const newFilters = { ...filters };
+    
+    if (newTags.length === 0) {
+      // Remove tags property completely if no tags are selected
+      if (newFilters.tags) {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const { tags: _, ...rest } = newFilters;
+        setFilters(rest);
+        onFilterChange(rest);
+      }
+    } else {
+      // Add tags to filters
+      newFilters.tags = newTags;
+      setFilters(newFilters);
+      onFilterChange(newFilters);
+    }
   };
 
   const handleDateChange = (type: 'from' | 'to', date?: Date) => {
+    let newFilters: EventFilters = { ...filters };
+    
     if (type === 'from') {
       setDateFrom(date);
+      
       if (date) {
-        setFilters({ ...filters, dateFrom: format(date, 'yyyy-MM-dd') });
-      } else {
-        const { dateFrom, ...rest } = filters;
-        setFilters(rest);
+        newFilters.dateFrom = format(date, 'yyyy-MM-dd');
+      } else if (filters.dateFrom) {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const { dateFrom: _, ...rest } = newFilters;
+        newFilters = rest;
       }
     } else {
       setDateTo(date);
+      
       if (date) {
-        setFilters({ ...filters, dateTo: format(date, 'yyyy-MM-dd') });
-      } else {
-        const { dateTo, ...rest } = filters;
-        setFilters(rest);
+        newFilters.dateTo = format(date, 'yyyy-MM-dd');
+      } else if (filters.dateTo) {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const { dateTo: _, ...rest } = newFilters;
+        newFilters = rest;
       }
     }
     
-    // Only update if both dates are set or explicitly cleared
-    if ((type === 'from' && dateTo) || (type === 'to' && dateFrom) || (!date)) {
-      onFilterChange({
-        ...filters,
-        ...(type === 'from' 
-          ? { dateFrom: date ? format(date, 'yyyy-MM-dd') : undefined }
-          : { dateTo: date ? format(date, 'yyyy-MM-dd') : undefined }
-        )
-      });
-    }
+    setFilters(newFilters);
+    onFilterChange(newFilters);
   };
 
   const resetFilters = () => {
@@ -190,25 +221,30 @@ export default function EventsFilter({ categories, tags, onFilterChange }: Event
         </Button>
       </div>
       
-      <AnimatePresence>
-        <motion.div 
-          initial={{ opacity: 0, height: 0 }}
-          animate={{ opacity: 1, height: "auto" }}
-          exit={{ opacity: 0, height: 0 }}
-          className="flex flex-wrap gap-2"
-        >
-          {tags.map((tag) => (
-            <Badge
-              key={tag}
-              variant={selectedTags.includes(tag) ? "default" : "outline"}
-              className="cursor-pointer"
-              onClick={() => handleTagToggle(tag)}
-            >
-              {tag}
-            </Badge>
-          ))}
-        </motion.div>
-      </AnimatePresence>
+      {tags.length > 0 && (
+        <AnimatePresence>
+          <motion.div 
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            className="flex flex-wrap gap-2"
+          >
+            {tags.map((tag) => (
+              <Badge
+                key={tag}
+                variant={selectedTags.includes(tag) ? "default" : "outline"}
+                className={cn(
+                  "cursor-pointer transition-all", 
+                  selectedTags.includes(tag) ? "bg-primary" : "hover:bg-primary/10"
+                )}
+                onClick={() => handleTagToggle(tag)}
+              >
+                {tag}
+              </Badge>
+            ))}
+          </motion.div>
+        </AnimatePresence>
+      )}
       
       {Object.keys(filters).length > 0 && (
         <motion.div
@@ -219,7 +255,7 @@ export default function EventsFilter({ categories, tags, onFilterChange }: Event
           <span>Active filters:</span>
           <div className="flex flex-wrap gap-2 ml-2">
             {filters.category && (
-              <Badge variant="secondary">{filters.category}</Badge>
+              <Badge variant="secondary">Category: {filters.category}</Badge>
             )}
             {filters.dateFrom && (
               <Badge variant="secondary">From: {filters.dateFrom}</Badge>
@@ -230,9 +266,9 @@ export default function EventsFilter({ categories, tags, onFilterChange }: Event
             {filters.search && (
               <Badge variant="secondary">Search: {filters.search}</Badge>
             )}
-            {selectedTags.map((tag) => (
+            {filters.tags && filters.tags.map((tag) => (
               <Badge key={tag} variant="secondary">
-                {tag}
+                Tag: {tag}
               </Badge>
             ))}
           </div>

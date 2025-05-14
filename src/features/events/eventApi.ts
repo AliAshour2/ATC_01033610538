@@ -24,18 +24,37 @@ export const eventApi = createApi({
   reducerPath: "eventApi",
   baseQuery: fakeBaseQuery(),
   tagTypes: ["Event"],
-  endpoints: (builder) => ({    getEvents: builder.query<Event[], EventFilters | void>({
+  endpoints: (builder) => ({
+    getEvents: builder.query<Event[], EventFilters | void>({
       async queryFn(filters: EventFilters = {}) {
         try {
+          console.log("Applying filters:", JSON.stringify(filters, null, 2));
+          
           const eventsRef = collection(db, "events");
-          const queryConstraints = [];          // Add category filter (if not 'all' and defined)
-          if (filters.category && filters.category !== 'all') {
+          const queryConstraints = [];
+          
+
+          const hasOtherFilters = !!(filters.dateFrom || filters.dateTo || filters.tags?.length);
+          
+          if (filters.category && !hasOtherFilters) {
             queryConstraints.push(where("category", "==", filters.category));
           }
+          
+          
 
-          // Handle tags filter
           if (filters.tags && filters.tags.length > 0) {
-            queryConstraints.push(where("tags", "array-contains-any", filters.tags.slice(0, 10)));
+            console.log(`Filtering by tags: ${filters.tags.join(', ')}`);
+            
+            if (filters.tags.length === 1) {
+
+              queryConstraints.push(where("tags", "array-contains", filters.tags[0]));
+            } else if (filters.tags.length <= 10) {
+
+              queryConstraints.push(where("tags", "array-contains-any", filters.tags));
+            } else {
+
+              queryConstraints.push(where("tags", "array-contains-any", filters.tags.slice(0, 10)));
+            }
           }
 
           // Add date filters
@@ -51,47 +70,84 @@ export const eventApi = createApi({
             queryConstraints.push(where("date", "<=", Timestamp.fromDate(toDate)));
           }
 
-          // Add orderBy constraint last
+          // Add orderBy constraint
           queryConstraints.push(orderBy("date", "asc"));
-
+          
           // Create the query with all constraints
-          const baseQuery = query(eventsRef, ...queryConstraints);          try {
+          const baseQuery = queryConstraints.length > 0 
+            ? query(eventsRef, ...queryConstraints) 
+            : query(eventsRef, orderBy("date", "asc"));
+            
+          console.log("Executing query with constraints:", queryConstraints.length);
+            
+          try {
             const querySnapshot = await getDocs(baseQuery);
+            console.log(`Found ${querySnapshot.docs.length} events from database`);
+            
             let events = querySnapshot.docs.map((doc) => {
-              const data = doc.data();              return {
+              const data = doc.data();
+              
+              return {
                 id: doc.id,
                 title: data.title || '',
                 description: data.description || '',
                 date: data.date?.toDate()?.toISOString() || new Date().toISOString(),
                 venue: data.venue || data.location || '',
+                location: data.location || data.venue || '',
                 category: data.category || '',
                 tags: Array.isArray(data.tags) ? data.tags : [],
                 imageUrl: data.imageUrl || '/placeholder.jpg',
                 price: Number(data.price) || 0,
                 capacity: Number(data.capacity) || 0,
+                organizerId: data.organizerId || '',
               } as Event;
             });
+
+            // Handle category filtering client-side if we couldn't use it in the query
+            if (filters.category && hasOtherFilters) {
+              console.log(`Filtering by category client-side: ${filters.category}`);
+              events = events.filter(event => 
+                event.category?.toLowerCase() === filters.category?.toLowerCase()
+              );
+            }
+
+            // Handle additional tag filtering client-side if needed (for more than 10 tags)
+            if (filters.tags && filters.tags.length > 10) {
+              console.log("Filtering additional tags client-side");
+              events = events.filter((event) => {
+                // For tags beyond the 10th, check if they exist in the event tags
+                return filters.tags!.slice(10).every(tag => 
+                  event.tags?.some(eventTag => 
+                    eventTag.toLowerCase() === tag.toLowerCase()
+                  )
+                );
+              });
+            }
 
             // Apply search filter client-side
             if (filters.search) {
               const term = filters.search.toLowerCase();
+              console.log(`Applying search filter: ${term}`);
               events = events.filter((event) =>
                 event.title.toLowerCase().includes(term) || 
                 event.description.toLowerCase().includes(term) ||
                 (event.venue ?? '').toLowerCase().includes(term) ||
-                (event.category ?? '').toLowerCase().includes(term)
+                (event.category ?? '').toLowerCase().includes(term) ||
+                (event.tags ?? []).some(tag => tag.toLowerCase().includes(term))
               );
             }
 
             // Ensure events are sorted by date
             events.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
-
+            
+            console.log(`Returning ${events.length} events after all filters`);
             return { data: events };
           } catch (queryError) {
             console.error('Error executing query:', queryError);
             return handleError(queryError);
           }
         } catch (error) {
+          console.error('Error in getEvents:', error);
           return handleError(error);
         }
       },

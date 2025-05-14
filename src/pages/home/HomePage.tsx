@@ -3,12 +3,16 @@ import EventsFilter from "@/components/events/EventsFilters";
 import { Button } from "@/components/ui/button";
 import { useGetEventsQuery } from "@/features/events/eventApi";
 import type { EventFilters } from "@/types";
-import { useState, useMemo, useCallback } from "react";
+import { useState, useMemo, useCallback, useEffect } from "react";
 
 const HomePage = () => {
   const [filters, setFilters] = useState<EventFilters>({});
-  const { data: events, isLoading , error, isFetching } = useGetEventsQuery(filters);
+  const { data: events, isLoading, error, isFetching } = useGetEventsQuery(filters);
 
+  // Debug log for filters
+  useEffect(() => {
+    console.log("HomePage filters:", JSON.stringify(filters, null, 2));
+  }, [filters]);
   
   const { categories, tags } = useMemo(() => {
     if (!events) return { categories: [], tags: [] };
@@ -29,6 +33,7 @@ const HomePage = () => {
 
   // Handle filter changes
   const handleFilterChange = useCallback((newFilters: EventFilters) => {
+    console.log("Filter change received:", JSON.stringify(newFilters, null, 2));
     setFilters(newFilters);
   }, []);
 
@@ -47,7 +52,9 @@ const HomePage = () => {
         <Button onClick={() => window.location.reload()}>Try Again</Button>
       </div>
     );
-  }  if (!events?.length) {
+  }  
+  
+  if (!events?.length) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[400px] space-y-4">
         <p className="text-muted-foreground text-lg">
@@ -62,7 +69,9 @@ const HomePage = () => {
         )}
       </div>
     );
-  }  return (
+  }  
+  
+  return (
     <div>
       <div className="mb-8">
         <h1 className="text-3xl font-bold mb-6">Upcoming Events</h1>
