@@ -1,20 +1,20 @@
 import { db } from "@/lib/firebase";
-import { 
-  collection, 
-  doc, 
-  getDocs, 
-  getDoc, 
-  addDoc, 
-  updateDoc, 
+import {
+  collection,
+  doc,
+  getDocs,
+  getDoc,
+  addDoc,
+  updateDoc,
   deleteDoc,
   query,
   where,
-  orderBy
-} from 'firebase/firestore';
+  orderBy,
+} from "firebase/firestore";
 import { createApi, fakeBaseQuery } from "@reduxjs/toolkit/query/react";
 import { handleError } from "@/helpers/handleError";
 
-interface Booking {
+export interface Booking {
   id: string;
   eventId: string;
   userId: string;
@@ -36,45 +36,45 @@ export const bookingApi = createApi({
     getUserBookings: builder.query<Booking[], string>({
       async queryFn(userId) {
         try {
-          const bookingsRef = collection(db, 'bookings');
+          const bookingsRef = collection(db, "bookings");
           const q = query(
             bookingsRef,
-            where('userId', '==', userId),
-            orderBy('bookedAt', 'desc')
+            where("userId", "==", userId),
+            orderBy("bookedAt", "desc")
           );
           const querySnapshot = await getDocs(q);
-          const bookings = querySnapshot.docs.map(doc => ({
+          const bookings = querySnapshot.docs.map((doc) => ({
             id: doc.id,
-            ...doc.data()
+            ...doc.data(),
           })) as Booking[];
           return { data: bookings };
         } catch (error) {
           return handleError(error);
         }
       },
-      providesTags: ['Booking'],
+      providesTags: ["Booking"],
     }),
-    
+
     getEventBookings: builder.query<Booking[], string>({
       async queryFn(eventId) {
         try {
-          const bookingsRef = collection(db, 'bookings');
+          const bookingsRef = collection(db, "bookings");
           const q = query(
             bookingsRef,
-            where('eventId', '==', eventId),
-            orderBy('bookedAt', 'desc')
+            where("eventId", "==", eventId),
+            orderBy("bookedAt", "desc")
           );
           const querySnapshot = await getDocs(q);
-          const bookings = querySnapshot.docs.map(doc => ({
+          const bookings = querySnapshot.docs.map((doc) => ({
             id: doc.id,
-            ...doc.data()
+            ...doc.data(),
           })) as Booking[];
           return { data: bookings };
         } catch (error) {
           return handleError(error);
         }
       },
-      providesTags: ['Booking'],
+      providesTags: ["Booking"],
     }),
 
     createBooking: builder.mutation<Booking, CreateBookingDto>({
@@ -82,38 +82,40 @@ export const bookingApi = createApi({
         try {
           const booking = {
             ...bookingData,
-            status: 'confirmed' as const,
+            status: "confirmed" as const,
             bookedAt: new Date().toISOString(),
             checkedIn: false,
           };
-          const bookingsRef = collection(db, 'bookings');
+          const bookingsRef = collection(db, "bookings");
           const docRef = await addDoc(bookingsRef, booking);
           return { data: { id: docRef.id, ...booking } };
         } catch (error) {
           return handleError(error);
         }
       },
-      invalidatesTags: ['Booking'],
+      invalidatesTags: ["Booking"],
     }),
 
-
-    updateBookingStatus: builder.mutation<void, { id: string; status: Booking['status'] }>({
+    updateBookingStatus: builder.mutation<
+      void,
+      { id: string; status: Booking["status"] }
+    >({
       async queryFn({ id, status }) {
         try {
-          const docRef = doc(db, 'bookings', id);
+          const docRef = doc(db, "bookings", id);
           await updateDoc(docRef, { status });
           return { data: undefined };
         } catch (error) {
           return handleError(error);
         }
       },
-      invalidatesTags: ['Booking'],
+      invalidatesTags: ["Booking"],
     }),
 
-        checkInBooking: builder.mutation<void, string>({
+    checkInBooking: builder.mutation<void, string>({
       async queryFn(bookingId) {
         try {
-          const docRef = doc(db, 'bookings', bookingId);
+          const docRef = doc(db, "bookings", bookingId);
           await updateDoc(docRef, {
             checkedIn: true,
             checkedInAt: new Date().toISOString(),
@@ -123,34 +125,43 @@ export const bookingApi = createApi({
           return handleError(error);
         }
       },
-      invalidatesTags: ['Booking'],
+      invalidatesTags: ["Booking"],
     }),
 
     cancelBooking: builder.mutation<void, string>({
       async queryFn(id) {
         try {
-          const docRef = doc(db, 'bookings', id);
-          await updateDoc(docRef, { status: 'cancelled' });
+          const docRef = doc(db, "bookings", id);
+          await updateDoc(docRef, { status: "cancelled" });
           return { data: undefined };
         } catch (error) {
           return handleError(error);
         }
       },
-      invalidatesTags: ['Booking'],
+      invalidatesTags: ["Booking"],
     }),
 
     deleteBooking: builder.mutation<void, string>({
       async queryFn(id) {
         try {
-          const docRef = doc(db, 'bookings', id);
+          const docRef = doc(db, "bookings", id);
           await deleteDoc(docRef);
           return { data: undefined };
         } catch (error) {
           return handleError(error);
         }
       },
-      invalidatesTags: ['Booking'],
-  }),
-    
+      invalidatesTags: ["Booking"],
+    }),
   }),
 });
+
+export const {
+  useCancelBookingMutation,
+  useCheckInBookingMutation,
+  useCreateBookingMutation,
+  useDeleteBookingMutation,
+  useGetEventBookingsQuery,
+  useUpdateBookingStatusMutation,
+  useGetUserBookingsQuery,
+} = bookingApi;
