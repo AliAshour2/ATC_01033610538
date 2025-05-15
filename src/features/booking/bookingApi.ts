@@ -32,6 +32,27 @@ export const bookingApi = createApi({
   baseQuery: fakeBaseQuery(),
   tagTypes: ["Booking"],
   endpoints: (builder) => ({
+    getBookings: builder.query<Booking[], void>({
+      async queryFn() {
+        try {
+          const bookingsRef = collection(db, "bookings");
+          const q = query(
+            bookingsRef,
+            orderBy("bookedAt", "desc")
+          );
+          const querySnapshot = await getDocs(q);
+          const bookings = querySnapshot.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+          })) as Booking[];
+          return { data: bookings };
+        } catch (error) {
+          return handleError(error);
+        }
+      },
+      providesTags: ["Booking"],
+    }),
+
     getUserBookings: builder.query<Booking[], string>({
       async queryFn(userId) {
         try {
@@ -156,6 +177,7 @@ export const bookingApi = createApi({
 });
 
 export const {
+  useGetBookingsQuery,
   useCancelBookingMutation,
   useCheckInBookingMutation,
   useCreateBookingMutation,
