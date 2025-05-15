@@ -3,6 +3,7 @@ import BookingConfirmation from "@/components/booking/BookingConfirmation";
 import AdminLayout from "@/components/layout/AdminLayout";
 import MainLayout from "@/components/layout/MainLayout";
 import AdminDashboard from "@/pages/admin/AdminDashboard";
+import AdminUsers from "@/pages/admin/AdminUsers";
 import LoginPage from "@/pages/auth/LoginPage";
 import RegisterPage from "@/pages/auth/RegisterPage";
 import BookingsPage from "@/pages/booking/BookingsPage";
@@ -21,6 +22,11 @@ const AppRoutes = () => {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/events/:eventId" element={<EventDetails />} />
+        {/* <Route path="/admin" element={<AdminLayout/>}/> */}
+        {/* <Route path="users" element={<AdminUsers />} /> */}
+        <Route path="/admin" element={<AdminLayout/>}>
+        <Route path="users" element={<AdminUsers />} />
+        </Route>
         <Route
           path="booking-confirmation/:eventId"
           element={
@@ -36,11 +42,12 @@ const AppRoutes = () => {
               <BookingsPage />
             </AuthGuard>
           }
+
         />
       </Route>
 
       {/* Admin Layout Protected Route */}
-      <Route
+      {/* <Route
         path="/admin"
         element={
           <AuthGuard allowedRoles={[UserRole.ADMIN]}>
@@ -49,7 +56,7 @@ const AppRoutes = () => {
         }
       >
         <Route index element={<AdminDashboard />} />
-      </Route>
+      </Route> */}
 
       {/* 404 Not Found */}
     </Routes>

@@ -8,6 +8,7 @@ import {
   deleteDoc,
   query,
   where,
+  addDoc,
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { UserRole, type User } from "@/types";
@@ -16,6 +17,12 @@ import { handleError } from "@/helpers/handleError";
 interface UpdateUserDto {
   name?: string;
   role?: UserRole;
+}
+
+interface CreateUserDto{
+  name : string ;
+  email : string ;
+  role : UserRole ;
 }
 
 export const userApi = createApi({
@@ -55,6 +62,27 @@ export const userApi = createApi({
         }
       },
       providesTags: ["User"],
+    }),
+
+    createUser: builder.mutation<User, CreateUserDto>({
+      async queryFn(data) {
+        try {
+          const usersRef = collection(db, 'users');
+          const docRef = await addDoc(usersRef, {
+            ...data,
+            createdAt: new Date().toISOString(),
+          });
+          const newUser = { 
+            id: docRef.id, 
+            ...data,
+            createdAt: new Date().toISOString()
+          } as User;
+          return { data: newUser };
+        } catch (error: unknown) {
+          return { error: (error as Error).message };
+        }
+      },
+      invalidatesTags: ['User'],
     }),
 
     updateUser: builder.mutation<void, { id: string; data: UpdateUserDto }>({
@@ -108,11 +136,10 @@ export const userApi = createApi({
 });
 
 export const {
+  useUpdateUserMutation,
   useDeleteUserMutation,
   useGetUserQuery,
   useGetUsersByRoleQuery,
   useGetUsersQuery,
-  useLazyGetUsersQuery,
-  useLazyGetUserQuery,
-  useLazyGetUsersByRoleQuery,
+  useCreateUserMutation,
 } = userApi;

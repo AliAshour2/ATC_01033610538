@@ -11,6 +11,8 @@ export interface User {
   avatar?: string;
   phoneNumber?: string;
   organization?: string;
+  createdAt?: string;
+  lastLogin?: string;
 }
 
 
@@ -40,4 +42,11 @@ export interface EventFilters {
   tags?: string[];
   dateFrom?: string;
   dateTo?: string;
+}
+
+export interface UserFormData {
+  name: string;
+  email: string;
+  role: UserRole;
+  password?: string;
 }
