@@ -1,6 +1,6 @@
-import { useState } from 'react';
-import { motion } from 'framer-motion';
-import { PageHeader } from '@/components/shared/PageHeader';
+import { useState } from "react";
+import { motion } from "framer-motion";
+import { PageHeader } from "@/components/shared/PageHeader";
 import {
   Table,
   TableBody,
@@ -12,20 +12,24 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { 
+import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuTrigger
+  DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { UserModal } from "@/components/admin/UserModal";
 import { DeleteUserDialog } from "@/components/admin/DeleteUserDialog";
-import {  UserRole, type User, type UserFormData } from "@/types";
-;
-import { Edit, MoreHorizontal,  Search,  Trash, UserPlus } from "lucide-react";
-import type { FC } from 'react';
-import { useCreateUserMutation, useDeleteUserMutation, useGetUsersQuery,  useUpdateUserMutation } from '@/features/user/userApi';
-import toast from 'react-hot-toast';
+import { UserRole, type User, type UserFormData } from "@/types";
+import { Edit, MoreHorizontal, Search, Trash, UserPlus } from "lucide-react";
+import type { FC } from "react";
+import {
+  useCreateUserMutation,
+  useDeleteUserMutation,
+  useGetUsersQuery,
+  useUpdateUserMutation,
+} from "@/features/user/userApi";
+import toast from "react-hot-toast";
 
 const AdminUsers: FC = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -33,17 +37,16 @@ const AdminUsers: FC = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
-  
+
   const { data: users = [], isLoading: isLoadingUsers } = useGetUsersQuery();
   const [createUser, { isLoading: isCreating }] = useCreateUserMutation();
   const [updateUser, { isLoading: isUpdating }] = useUpdateUserMutation();
   const [deleteUser, { isLoading: isDeleting }] = useDeleteUserMutation();
 
- 
- 
-  const filteredUsers = users.filter(user => 
-    user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    user.email.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredUsers = users.filter(
+    (user) =>
+      user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      user.email.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const handleOpenCreateModal = () => {
@@ -65,31 +68,35 @@ const AdminUsers: FC = () => {
       await createUser({
         name: data.name,
         email: data.email,
-        role: data.role
+        role: data.role,
       }).unwrap();
       setIsCreateModalOpen(false);
       toast.success("User created successfully");
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Failed to create user");
+      toast.error(
+        error instanceof Error ? error.message : "Failed to create user"
+      );
     }
   };
 
   const handleUpdateUser = async (data: UserFormData) => {
     if (!selectedUser) return;
-    
+
     try {
       await updateUser({
         id: selectedUser.id,
         data: {
           name: data.name,
-          role: data.role
-        }
+          role: data.role,
+        },
       }).unwrap();
       setIsEditModalOpen(false);
       setSelectedUser(null);
       toast.success("User updated successfully");
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Failed to update user");
+      toast.error(
+        error instanceof Error ? error.message : "Failed to update user"
+      );
     }
   };
 
@@ -100,28 +107,25 @@ const AdminUsers: FC = () => {
       setSelectedUser(null);
       toast.success("User deleted successfully");
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Failed to delete user");
+      toast.error(
+        error instanceof Error ? error.message : "Failed to delete user"
+      );
     }
   };
 
   return (
     <div>
-      <PageHeader 
-        title="User Management" 
+      <PageHeader
+        title="User Management"
         description="View and manage user accounts"
-        action={{
-          label: "Add User",
-          onClick: handleOpenCreateModal,
-        }}
       />
-      
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-      >
+
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
         <div className="flex justify-between items-center mb-6">
           <div className="relative max-w-sm">
-            <Search/>
+            <span className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-muted-foreground">
+              <Search className="w-4 h-4" />
+            </span>
             <Input
               placeholder="Search users..."
               className="pl-10"
@@ -129,12 +133,16 @@ const AdminUsers: FC = () => {
               onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
-          <Button onClick={handleOpenCreateModal} className="flex items-center gap-2">
+
+          <Button
+            onClick={handleOpenCreateModal}
+            className="flex items-center gap-2"
+          >
             <UserPlus className="h-4 w-4" />
             <span className="hidden md:inline">Add User</span>
           </Button>
         </div>
-        
+
         <div className="bg-white dark:bg-gray-950 rounded-lg border border-gray-200 dark:border-gray-800 overflow-hidden">
           {isLoadingUsers ? (
             <div className="p-8 text-center">
@@ -156,54 +164,73 @@ const AdminUsers: FC = () => {
                 <TableBody>
                   {filteredUsers.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                      <TableCell
+                        colSpan={6}
+                        className="text-center py-8 text-muted-foreground"
+                      >
                         No users found
                       </TableCell>
                     </TableRow>
                   ) : (
                     filteredUsers.map((user) => (
                       <TableRow key={user.id}>
-                        <TableCell className="font-medium">{user.name}</TableCell>
+                        <TableCell className="font-medium">
+                          {user.name}
+                        </TableCell>
                         <TableCell>{user.email}</TableCell>
                         <TableCell>
-                          <Badge variant={user.role === UserRole.ADMIN ? "default" : "secondary"}>
+                          <Badge
+                            variant={
+                              user.role === UserRole.ADMIN
+                                ? "default"
+                                : "secondary"
+                            }
+                          >
                             {user.role}
                           </Badge>
                         </TableCell>
-                        <TableCell>{user.createdAt ? new Date(user.createdAt).toLocaleDateString() : "-"}</TableCell>
-                        <TableCell>{user.lastLogin ? new Date(user.lastLogin).toLocaleDateString() : "-"}</TableCell>
+                        <TableCell>
+                          {user.createdAt
+                            ? new Date(user.createdAt).toLocaleDateString()
+                            : "-"}
+                        </TableCell>
+                        <TableCell>
+                          {user.lastLogin
+                            ? new Date(user.lastLogin).toLocaleDateString()
+                            : "-"}
+                        </TableCell>
                         <TableCell className="text-right">
-                        <DropdownMenu>
-  <DropdownMenuTrigger asChild>
-    <Button 
-      variant="ghost" 
-      size="icon"
-      className="text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-800"
-    >
-      <MoreHorizontal className="h-4 w-4" />
-      <span className="sr-only">Actions</span>
-    </Button>
-  </DropdownMenuTrigger>
-  <DropdownMenuContent 
-    align="end"
-    className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-lg rounded-md min-w-[150px]"
-  >
-    <DropdownMenuItem 
-      onClick={() => handleOpenEditModal(user)}
-      className="text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 focus:bg-gray-100 dark:focus:bg-gray-700"
-    >
-      <Edit className="mr-2 h-4 w-4 text-gray-500 dark:text-gray-400" /> 
-      Edit
-    </DropdownMenuItem>
-    <DropdownMenuItem 
-      onClick={() => handleOpenDeleteDialog(user)}
-      className="text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 focus:bg-red-50 dark:focus:bg-red-900/30"
-    >
-      <Trash className="mr-2 h-4 w-4" /> 
-      Delete
-    </DropdownMenuItem>
-  </DropdownMenuContent>
-</DropdownMenu>
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-800"
+                              >
+                                <MoreHorizontal className="h-4 w-4" />
+                                <span className="sr-only">Actions</span>
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent
+                              align="end"
+                              className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-lg rounded-md min-w-[150px]"
+                            >
+                              <DropdownMenuItem
+                                onClick={() => handleOpenEditModal(user)}
+                                className="text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 focus:bg-gray-100 dark:focus:bg-gray-700"
+                              >
+                                <Edit className="mr-2 h-4 w-4 text-gray-500 dark:text-gray-400" />
+                                Edit
+                              </DropdownMenuItem>
+                              <DropdownMenuItem
+                                onClick={() => handleOpenDeleteDialog(user)}
+                                className="text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 focus:bg-red-50 dark:focus:bg-red-900/30"
+                              >
+                                <Trash className="mr-2 h-4 w-4" />
+                                Delete
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
                         </TableCell>
                       </TableRow>
                     ))
