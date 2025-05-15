@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import type { Event } from "@/types";
+
 import { CalendarIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Calendar } from "@/components/ui/calendar";
@@ -39,9 +39,14 @@ const eventSchema = z.object({
 
 export type EventFormValues = z.infer<typeof eventSchema>;
 
+// Define the form output type separately to include the transformed tags
+export type EventFormSubmitValues = Omit<EventFormValues, 'tags'> & { 
+  tags: string[] 
+};
+
 interface EventFormProps {
   defaultValues?: Partial<EventFormValues>;
-  onSubmit: (data: EventFormValues) => void;
+  onSubmit: (data: EventFormSubmitValues) => void;
   isLoading?: boolean;
 }
 
@@ -57,34 +62,38 @@ const EventForm = ({ defaultValues, onSubmit, isLoading }: EventFormProps) => {
       price: defaultValues?.price || 0,
       category: defaultValues?.category || "",
       imageUrl: defaultValues?.imageUrl || "",
-      tags: defaultValues?.tags ? defaultValues.tags.join(", ") : "",
+      tags: defaultValues?.tags || "",
       organizerId: defaultValues?.organizerId || "",
     },
   });
 
   const handleSubmit = (data: EventFormValues) => {
-    // Format tags from comma-separated string to array
-    const formattedData = {
+    const formattedData: EventFormSubmitValues = {
       ...data,
-      tags: data.tags ? data.tags.split(",").map(tag => tag.trim()) : [],
+      tags: data.tags ? (data.tags as string).split(",").map((tag: string) => tag.trim()) : [],
     };
+    
     onSubmit(formattedData);
   };
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
+      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6 p-4 bg-white rounded-xl shadow-md border border-gray-200">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <FormField
             control={form.control}
             name="title"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Title</FormLabel>
+                <FormLabel className="text-blue-700">Title</FormLabel>
                 <FormControl>
-                  <Input placeholder="Event title" {...field} />
+                  <Input
+                    className="focus:border-blue-500 focus:ring-blue-500"
+                    placeholder="Event title"
+                    {...field}
+                  />
                 </FormControl>
-                <FormMessage />
+                <FormMessage className="text-red-500" />
               </FormItem>
             )}
           />
@@ -94,22 +103,18 @@ const EventForm = ({ defaultValues, onSubmit, isLoading }: EventFormProps) => {
             name="date"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Date</FormLabel>
+                <FormLabel className="text-blue-700">Date</FormLabel>
                 <Popover>
                   <PopoverTrigger asChild>
                     <FormControl>
                       <Button
                         variant="outline"
                         className={cn(
-                          "w-full pl-3 text-left font-normal",
+                          "w-full pl-3 text-left font-normal focus:ring-blue-500",
                           !field.value && "text-muted-foreground"
                         )}
                       >
-                        {field.value ? (
-                          format(field.value, "PPP")
-                        ) : (
-                          <span>Pick a date</span>
-                        )}
+                        {field.value ? format(field.value, "PPP") : <span>Pick a date</span>}
                         <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                       </Button>
                     </FormControl>
@@ -117,6 +122,7 @@ const EventForm = ({ defaultValues, onSubmit, isLoading }: EventFormProps) => {
                   <PopoverContent className="w-auto p-0" align="start">
                     <Calendar
                       mode="single"
+                      className="bg-gray-700 text-white"
                       selected={field.value}
                       onSelect={field.onChange}
                       disabled={(date) => date < new Date()}
@@ -124,21 +130,25 @@ const EventForm = ({ defaultValues, onSubmit, isLoading }: EventFormProps) => {
                     />
                   </PopoverContent>
                 </Popover>
-                <FormMessage />
+                <FormMessage className="text-red-500" />
               </FormItem>
             )}
           />
-          
+
           <FormField
             control={form.control}
             name="location"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Location</FormLabel>
+                <FormLabel className="text-blue-700">Location</FormLabel>
                 <FormControl>
-                  <Input placeholder="Event location" {...field} />
+                  <Input
+                    className="focus:border-blue-500 focus:ring-blue-500"
+                    placeholder="Event location"
+                    {...field}
+                  />
                 </FormControl>
-                <FormMessage />
+                <FormMessage className="text-red-500" />
               </FormItem>
             )}
           />
@@ -148,11 +158,15 @@ const EventForm = ({ defaultValues, onSubmit, isLoading }: EventFormProps) => {
             name="category"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Category</FormLabel>
+                <FormLabel className="text-blue-700">Category</FormLabel>
                 <FormControl>
-                  <Input placeholder="Event category" {...field} />
+                  <Input
+                    className="focus:border-blue-500 focus:ring-blue-500"
+                    placeholder="Event category"
+                    {...field}
+                  />
                 </FormControl>
-                <FormMessage />
+                <FormMessage className="text-red-500" />
               </FormItem>
             )}
           />
@@ -162,16 +176,17 @@ const EventForm = ({ defaultValues, onSubmit, isLoading }: EventFormProps) => {
             name="capacity"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Capacity</FormLabel>
+                <FormLabel className="text-blue-700">Capacity</FormLabel>
                 <FormControl>
-                  <Input 
-                    type="number" 
-                    placeholder="Event capacity" 
-                    {...field} 
+                  <Input
+                    type="number"
+                    className="focus:border-blue-500 focus:ring-blue-500"
+                    placeholder="Event capacity"
+                    {...field}
                     onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
                   />
                 </FormControl>
-                <FormMessage />
+                <FormMessage className="text-red-500" />
               </FormItem>
             )}
           />
@@ -181,16 +196,17 @@ const EventForm = ({ defaultValues, onSubmit, isLoading }: EventFormProps) => {
             name="price"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Price</FormLabel>
+                <FormLabel className="text-blue-700">Price</FormLabel>
                 <FormControl>
-                  <Input 
-                    type="number" 
-                    placeholder="Event price" 
-                    {...field} 
+                  <Input
+                    type="number"
+                    className="focus:border-blue-500 focus:ring-blue-500"
+                    placeholder="Event price"
+                    {...field}
                     onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
                   />
                 </FormControl>
-                <FormMessage />
+                <FormMessage className="text-red-500" />
               </FormItem>
             )}
           />
@@ -200,12 +216,16 @@ const EventForm = ({ defaultValues, onSubmit, isLoading }: EventFormProps) => {
             name="imageUrl"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Image URL</FormLabel>
+                <FormLabel className="text-blue-700">Image URL</FormLabel>
                 <FormControl>
-                  <Input placeholder="Event image URL" {...field} />
+                  <Input
+                    className="focus:border-blue-500 focus:ring-blue-500"
+                    placeholder="Event image URL"
+                    {...field}
+                  />
                 </FormControl>
                 <FormDescription>URL to the event banner image</FormDescription>
-                <FormMessage />
+                <FormMessage className="text-red-500" />
               </FormItem>
             )}
           />
@@ -215,12 +235,16 @@ const EventForm = ({ defaultValues, onSubmit, isLoading }: EventFormProps) => {
             name="tags"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Tags</FormLabel>
+                <FormLabel className="text-blue-700">Tags</FormLabel>
                 <FormControl>
-                  <Input placeholder="Comma-separated tags" {...field} />
+                  <Input
+                    className="focus:border-blue-500 focus:ring-blue-500"
+                    placeholder="Comma-separated tags"
+                    {...field}
+                  />
                 </FormControl>
                 <FormDescription>Separate tags with commas (e.g., music, outdoor, family)</FormDescription>
-                <FormMessage />
+                <FormMessage className="text-red-500" />
               </FormItem>
             )}
           />
@@ -231,21 +255,25 @@ const EventForm = ({ defaultValues, onSubmit, isLoading }: EventFormProps) => {
           name="description"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Description</FormLabel>
+              <FormLabel className="text-blue-700">Description</FormLabel>
               <FormControl>
-                <Textarea 
-                  placeholder="Event description" 
-                  className="min-h-[120px]" 
-                  {...field} 
+                <Textarea
+                  className="min-h-[120px] focus:border-blue-500 focus:ring-blue-500"
+                  placeholder="Event description"
+                  {...field}
                 />
               </FormControl>
-              <FormMessage />
+              <FormMessage className="text-red-500" />
             </FormItem>
           )}
         />
 
         <div className="flex justify-end">
-          <Button type="submit" disabled={isLoading}>
+          <Button
+            type="submit"
+            className="bg-blue-600 hover:bg-blue-700 text-white"
+            disabled={isLoading}
+          >
             {isLoading ? "Saving..." : "Save Event"}
           </Button>
         </div>
@@ -254,4 +282,4 @@ const EventForm = ({ defaultValues, onSubmit, isLoading }: EventFormProps) => {
   );
 };
 
-export default EventForm; 
+export default EventForm;

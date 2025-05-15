@@ -32,7 +32,7 @@ export const UserModal: FC<UserModalProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-md  bg-white dark:bg-gray-700">
         <DialogHeader>
           <DialogTitle>{isEditing ? "Edit User" : "Add New User"}</DialogTitle>
           <DialogDescription>

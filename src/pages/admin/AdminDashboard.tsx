@@ -1,7 +1,5 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { AdminSidebar } from '@/components/layout/AdminSidebar';
-import { Navbar } from '@/components/layout/Navbar';
 import { PageHeader } from '@/components/shared/PageHeader';
 import {
   Card,
@@ -90,10 +88,8 @@ const AdminDashboard = () => {
     .slice(0, 5);
 
   return (
-    <div className="flex h-screen overflow-hidden">
-      <AdminSidebar />
+    <div className="flex h-screen overflow-hidden scrollbar-hide">
       <div className="flex-1 flex flex-col overflow-hidden">
-        <Navbar />
         <main className="flex-1 overflow-y-auto p-6 bg-gray-50 dark:bg-gray-900">
           <motion.div
             initial={{ opacity: 0, y: 10 }}

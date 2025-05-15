@@ -27,11 +27,6 @@ const AppRoutes = () => {
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/events/:eventId" element={<EventDetails />} />
         <Route path="/unauthorized" element={<UnauthorizedPage />} />
-        {/* <Route path="/admin" element={<AdminLayout/>}/> */}
-        {/* <Route path="users" element={<AdminUsers />} /> */}
-        <Route path="/admin" element={<AdminLayout/>}>
-        <Route path="users" element={<AdminUsers />} />
-        </Route>
         <Route
           path="booking-confirmation/:eventId"
           element={
@@ -47,19 +42,11 @@ const AppRoutes = () => {
               <BookingsPage />
             </AuthGuard>
           }
-
         />
       </Route>
 
       {/* Admin Layout Protected Route */}
-      <Route
-        path="/admin"
-        element={
-          <AuthGuard allowedRoles={[UserRole.ADMIN]}>
-            <AdminLayout />
-          </AuthGuard>
-        }
-      >
+      <Route path="/admin" element={<AdminLayout />}>
         <Route index element={<AdminDashboard />} />
         <Route path="events" element={<AdminEvents />} />
         <Route path="users" element={<AdminUsers />} />
@@ -73,3 +60,6 @@ const AppRoutes = () => {
 };
 
 export default AppRoutes;
+// <AuthGuard allowedRoles={[UserRole.ADMIN]}>
+//   <AdminLayout />
+// </AuthGuard>

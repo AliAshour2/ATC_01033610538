@@ -173,25 +173,37 @@ const AdminUsers: FC = () => {
                         <TableCell>{user.createdAt ? new Date(user.createdAt).toLocaleDateString() : "-"}</TableCell>
                         <TableCell>{user.lastLogin ? new Date(user.lastLogin).toLocaleDateString() : "-"}</TableCell>
                         <TableCell className="text-right">
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button variant="ghost" size="icon">
-                                <MoreHorizontal className="h-4 w-4" />
-                                <span className="sr-only">Actions</span>
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                              <DropdownMenuItem onClick={() => handleOpenEditModal(user)}>
-                                <Edit className="mr-2 h-4 w-4" /> Edit
-                              </DropdownMenuItem>
-                              <DropdownMenuItem 
-                                onClick={() => handleOpenDeleteDialog(user)}
-                                className="text-destructive focus:text-destructive"
-                              >
-                                <Trash className="mr-2 h-4 w-4" /> Delete
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
+                        <DropdownMenu>
+  <DropdownMenuTrigger asChild>
+    <Button 
+      variant="ghost" 
+      size="icon"
+      className="text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-800"
+    >
+      <MoreHorizontal className="h-4 w-4" />
+      <span className="sr-only">Actions</span>
+    </Button>
+  </DropdownMenuTrigger>
+  <DropdownMenuContent 
+    align="end"
+    className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-lg rounded-md min-w-[150px]"
+  >
+    <DropdownMenuItem 
+      onClick={() => handleOpenEditModal(user)}
+      className="text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 focus:bg-gray-100 dark:focus:bg-gray-700"
+    >
+      <Edit className="mr-2 h-4 w-4 text-gray-500 dark:text-gray-400" /> 
+      Edit
+    </DropdownMenuItem>
+    <DropdownMenuItem 
+      onClick={() => handleOpenDeleteDialog(user)}
+      className="text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 focus:bg-red-50 dark:focus:bg-red-900/30"
+    >
+      <Trash className="mr-2 h-4 w-4" /> 
+      Delete
+    </DropdownMenuItem>
+  </DropdownMenuContent>
+</DropdownMenu>
                         </TableCell>
                       </TableRow>
                     ))

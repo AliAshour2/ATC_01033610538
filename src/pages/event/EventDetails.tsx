@@ -49,10 +49,15 @@ const EventDetails = () => {
     return (
       <div className="container mx-auto px-4 py-10">
         <div className="flex flex-col items-center justify-center min-h-[400px] space-y-4">
-          <p className="text-lg text-muted-foreground">
+          <p className="text-lg text-gray-600 dark:text-gray-300">
             Failed to load event details
           </p>
-          <Button onClick={() => navigate("/")}>Back to Events</Button>
+          <Button 
+            className="bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600"
+            onClick={() => navigate("/")}
+          >
+            Back to Events
+          </Button>
         </div>
       </div>
     );
@@ -106,26 +111,30 @@ const EventDetails = () => {
           <div className="mb-6">
             <Button
               variant="ghost"
-              className="mb-4"
+              className="mb-4 text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-gray-100"
               onClick={() => navigate("/")}
             >
               <ChevronLeft className="mr-2 h-4 w-4" />
               Back to Events
             </Button>
 
-            <h1 className="text-4xl font-bold">{event.title}</h1>
+            <h1 className="text-4xl font-bold text-gray-800 dark:text-gray-100">
+              {event.title}
+            </h1>
 
             <div className="flex flex-wrap items-center gap-2 mt-3">
-              <Badge variant="secondary">{event.category}</Badge>
+              <Badge className="bg-teal-100 dark:bg-teal-900 text-teal-800 dark:text-teal-100">
+                {event.category}
+              </Badge>
               {event?.tags?.map((tag, index) => (
-                <Badge key={index} variant="outline">
+                <Badge key={index} variant="outline" className="border-gray-300 dark:border-gray-600">
                   {tag}
                 </Badge>
               )) || []}
             </div>
           </div>
 
-          <div className="rounded-lg overflow-hidden mb-8">
+          <div className="rounded-lg overflow-hidden mb-8 border border-gray-200 dark:border-gray-700">
             <img
               src={event.imageUrl}
               alt={event.title}
@@ -134,13 +143,17 @@ const EventDetails = () => {
           </div>
 
           <div className="prose prose-lg dark:prose-invert max-w-none">
-            <h2 className="text-2xl font-semibold mb-4">About This Event</h2>
-            <p>{event.description}</p>
+            <h2 className="text-2xl font-semibold mb-4 text-gray-800 dark:text-gray-100">
+              About This Event
+            </h2>
+            <p className="text-gray-700 dark:text-gray-300">{event.description}</p>
 
-            <Separator className="my-8" />
+            <Separator className="my-8 bg-gray-200 dark:bg-gray-700" />
 
-            <h2 className="text-2xl font-semibold mb-4">Venue Information</h2>
-            <p>{event.venue || event.location}</p>
+            <h2 className="text-2xl font-semibold mb-4 text-gray-800 dark:text-gray-100">
+              Venue Information
+            </h2>
+            <p className="text-gray-700 dark:text-gray-300">{event.venue || event.location}</p>
 
             <div className="mt-6">
               <div className="aspect-w-16 aspect-h-9">
@@ -155,7 +168,7 @@ const EventDetails = () => {
               </div>
             </div>
 
-            <Separator className="my-8" />
+            <Separator className="my-8 bg-gray-200 dark:bg-gray-700" />
 
             {/* Social Sharing Section */}
             <ShareEventButtons event={event} />
@@ -167,12 +180,12 @@ const EventDetails = () => {
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.5 }}
         >
-          <div className="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-800 p-6 sticky top-24">
+          <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6 sticky top-24 shadow-sm">
             <div className="mb-6">
-              <div className="text-2xl font-bold">
+              <div className="text-2xl font-bold text-gray-900 dark:text-gray-100">
                 ${event.price.toFixed(2)}
               </div>
-              <div className="text-muted-foreground">per ticket</div>
+              <div className="text-gray-600 dark:text-gray-400">per ticket</div>
             </div>
 
             {/* Add quantity selector */}
@@ -180,7 +193,7 @@ const EventDetails = () => {
               <div className="mb-6">
                 <label
                   htmlFor="quantity"
-                  className="block text-sm font-medium mb-2"
+                  className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300"
                 >
                   Number of Tickets
                 </label>
@@ -188,7 +201,7 @@ const EventDetails = () => {
                   id="quantity"
                   value={quantity}
                   onChange={(e) => setQuantity(Number(e.target.value))}
-                  className="w-full rounded-md border border-gray-300 bg-background px-3 py-2"
+                  className="w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 text-gray-900 dark:text-gray-100"
                   disabled={isBooking}
                 >
                   {[1, 2, 3, 4, 5].map((num) => (
@@ -203,20 +216,20 @@ const EventDetails = () => {
 
             <div className="space-y-4 mb-6">
               <div className="flex items-center">
-                <Calendar className="mr-2 h-4 w-4 text-muted-foreground" />
+                <Calendar className="mr-2 h-4 w-4 text-gray-500 dark:text-gray-400" />
                 <div>
-                  <div className="font-medium">Date and Time</div>
-                  <div className="text-sm text-muted-foreground">
+                  <div className="font-medium text-gray-800 dark:text-gray-200">Date and Time</div>
+                  <div className="text-sm text-gray-600 dark:text-gray-400">
                     {formattedDate} at {formattedTime}
                   </div>
                 </div>
               </div>
 
               <div className="flex items-center">
-                <MapPin className="mr-2 h-4 w-4 text-muted-foreground" />
+                <MapPin className="mr-2 h-4 w-4 text-gray-500 dark:text-gray-400" />
                 <div>
-                  <div className="font-medium">Location</div>
-                  <div className="text-sm text-muted-foreground">
+                  <div className="font-medium text-gray-800 dark:text-gray-200">Location</div>
+                  <div className="text-sm text-gray-600 dark:text-gray-400">
                     {event.venue || event.location}
                   </div>
                 </div>
@@ -226,17 +239,21 @@ const EventDetails = () => {
             {/* Booking button section */}
             {isBooked ? (
               <div className="flex flex-col gap-4">
-                <div className="flex items-center justify-center gap-2 text-primary bg-primary/10 p-3 rounded-md">
+                <div className="flex items-center justify-center gap-2 text-emerald-600 dark:text-emerald-400 bg-emerald-100 dark:bg-emerald-900/30 p-3 rounded-md">
                   <CheckCircle className="h-4 w-4" />
                   <span className="font-medium">You've booked this event</span>
                 </div>
-                <Button variant="outline" onClick={() => navigate("/bookings")}>
+                <Button 
+                  variant="outline" 
+                  className="border-gray-300 dark:border-gray-600 text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
+                  onClick={() => navigate("/bookings")}
+                >
                   View My Bookings
                 </Button>
               </div>
             ) : (
               <Button
-                className="w-full"
+                className="w-full bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600"
                 size="lg"
                 onClick={handleBookEvent}
                 disabled={isBooking}
@@ -249,7 +266,7 @@ const EventDetails = () => {
               </Button>
             )}
 
-            <div className="mt-6 text-center text-sm text-muted-foreground">
+            <div className="mt-6 text-center text-sm text-gray-500 dark:text-gray-400">
               Secure checkout • Instant confirmation
             </div>
           </div>
