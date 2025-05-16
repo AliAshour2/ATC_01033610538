@@ -45,8 +45,8 @@ const AdminUsers: FC = () => {
 
   const filteredUsers = users.filter(
     (user) =>
-      user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      user.email.toLowerCase().includes(searchQuery.toLowerCase())
+      user.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      user.email?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const handleOpenCreateModal = () => {
@@ -69,6 +69,7 @@ const AdminUsers: FC = () => {
         name: data.name,
         email: data.email,
         role: data.role,
+        password : data.password || "password123"
       }).unwrap();
       setIsCreateModalOpen(false);
       toast.success("User created successfully");

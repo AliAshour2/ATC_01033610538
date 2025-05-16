@@ -46,7 +46,15 @@ const AppRoutes = () => {
       </Route>
 
       {/* Admin Layout Protected Route */}
-      <Route path="/admin" element={<AdminLayout />}>
+      <Route
+        path="/admin"
+        element={
+          <AuthGuard allowedRoles={[UserRole.ADMIN]}>
+            <AdminLayout />
+          </AuthGuard>
+          // <AdminLayout />
+        }
+      >
         <Route index element={<AdminDashboard />} />
         <Route path="events" element={<AdminEvents />} />
         <Route path="users" element={<AdminUsers />} />
@@ -60,6 +68,3 @@ const AppRoutes = () => {
 };
 
 export default AppRoutes;
-// <AuthGuard allowedRoles={[UserRole.ADMIN]}>
-//   <AdminLayout />
-// </AuthGuard>

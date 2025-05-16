@@ -37,9 +37,14 @@ export function LoginForm() {
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
-      await login(values).unwrap();
+      const result = await login(values).unwrap();
+      
       toast.success("Logged in successfully");
-      navigate("/");
+      if (result.role === 'ADMIN') {
+        navigate("/admin");
+      } else {
+        navigate("/");
+      }
     } catch (error) {
       toast.error("Failed to login");
       handleError(error);

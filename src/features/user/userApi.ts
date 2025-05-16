@@ -8,11 +8,12 @@ import {
   deleteDoc,
   query,
   where,
-  addDoc,
+  setDoc,
 } from "firebase/firestore";
-import { db } from "@/lib/firebase";
+import { auth, db } from "@/lib/firebase";
 import { UserRole, type User } from "@/types";
 import { handleError } from "@/helpers/handleError";
+import { createUserWithEmailAndPassword } from "@firebase/auth";
 
 interface UpdateUserDto {
   name?: string;
@@ -64,25 +65,35 @@ export const userApi = createApi({
       providesTags: ["User"],
     }),
 
-    createUser: builder.mutation<User, CreateUserDto>({
+
+    createUser: builder.mutation<User, CreateUserDto & { password: string }>({
       async queryFn(data) {
         try {
-          const usersRef = collection(db, 'users');
-          const docRef = await addDoc(usersRef, {
-            ...data,
+          // First create Firebase Auth user
+          const userCredential = await createUserWithEmailAndPassword(
+            auth,
+            data.email,
+            data.password
+          );
+          
+          // Then use that Firebase Auth UID for the Firestore document
+          const user = {
+            id: userCredential.user.uid, // Use Firebase Auth UID
+            name: data.name,
+            email: data.email,
+            role: data.role,
             createdAt: new Date().toISOString(),
-          });
-          const newUser = { 
-            id: docRef.id, 
-            ...data,
-            createdAt: new Date().toISOString()
-          } as User;
-          return { data: newUser };
-        } catch (error: unknown) {
-          return { error: (error as Error).message };
+          };
+          
+          // Create Firestore document with matching ID
+          await setDoc(doc(db, "users", user.id), user);
+          
+          return { data: user };
+        } catch (error) {
+          return handleError(error);
         }
       },
-      invalidatesTags: ['User'],
+      invalidatesTags: ["User"],
     }),
 
     updateUser: builder.mutation<void, { id: string; data: UpdateUserDto }>({
