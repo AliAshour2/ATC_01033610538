@@ -27,6 +27,7 @@ const AppRoutes = () => {
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/events/:eventId" element={<EventDetails />} />
         <Route path="/unauthorized" element={<UnauthorizedPage />} />
+        <Route path="*" element={<NotFoundPage />} />
         <Route
           path="booking-confirmation/:eventId"
           element={
@@ -59,10 +60,9 @@ const AppRoutes = () => {
         <Route path="events" element={<AdminEvents />} />
         <Route path="users" element={<AdminUsers />} />
         <Route path="bookings" element={<AdminBookings />} />
+        <Route path="*" element={<NotFoundPage />} />
       </Route>
-
-      {/* 404 Not Found */}
-      <Route path="*" element={<NotFoundPage />} />
+   
     </Routes>
   );
 };
