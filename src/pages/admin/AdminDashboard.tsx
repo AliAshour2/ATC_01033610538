@@ -1,44 +1,22 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { PageHeader } from '@/components/shared/PageHeader';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Users, CalendarDays, BookCheck, DollarSign, TrendingUp, Activity, ChevronRight } from "lucide-react";
+import { Users, CalendarDays, BookCheck, DollarSign } from "lucide-react";
 import { useGetUsersQuery } from '@/features/user/userApi';
 import { useGetEventsQuery } from '@/features/events/eventApi';
-import { UserRole, type Event,  } from '@/types';
+import { UserRole, type Event } from '@/types';
 import { Link } from 'react-router-dom';
-// Chart component stub - would be replaced with actual chart library
-const DashboardChart = ({ data }: { data: number[] }) => {
-  return (
-    <div className="h-[200px] mt-2 flex items-end justify-between gap-2">
-      {Array.from({ length: 12 }).map((_, i) => {
-        const height = data[i] || Math.floor(Math.random() * 100) + 20;
-        return (
-          <div
-            key={i}
-            className="bg-primary/10 hover:bg-primary/20 rounded-t w-full"
-            style={{ height: `${height}%` }}
-          />
-        );
-      })}
-    </div>
-  );
-};
+
+// Import our new components
+
+import { TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { StatsCard } from '@/components/admin/dashboard/StatsCard';
+import { DataTableCard } from '@/components/admin/dashboard/DataTableCard';
+import { RecentActivityCard } from '@/components/admin/dashboard/RecentActivityCard';
+import { DashboardChart } from '@/components/admin/dashboard/DashboardChart';
+import { UserDistributionCard } from '@/components/admin/dashboard/UserDistributionCard';
 
 const AdminDashboard = () => {
   const { data: users = [], isLoading: isLoadingUsers } = useGetUsersQuery();
@@ -59,19 +37,16 @@ const AdminDashboard = () => {
 
   useEffect(() => {
     if (events.length > 0) {
-      // Get the 5 most recent events based on date
       const sortedEvents = [...events].sort((a, b) => 
         new Date(b.date).getTime() - new Date(a.date).getTime()
       );
       setRecentEvents(sortedEvents.slice(0, 5));
       
-      // Update stats
       setStats(prev => ({
         ...prev,
         totalEvents: events.length,
-        // Assuming we don't have booking data yet
-        totalBookings: Math.floor(Math.random() * 100) + 50, // Placeholder
-        totalRevenue: events.reduce((sum, event) => sum + event.price, 0) * 10, // Placeholder calculation
+        totalBookings: Math.floor(Math.random() * 100) + 50,
+        totalRevenue: events.reduce((sum, event) => sum + event.price, 0) * 10,
       }));
     }
   }, [events]);
@@ -82,13 +57,12 @@ const AdminDashboard = () => {
     user: users.filter(user => user.role === UserRole.USER).length,
   };
 
-  // Placeholder for recent users (most recently created)
   const recentUsers = [...users]
     .sort((a, b) => new Date(b.createdAt || '').getTime() - new Date(a.createdAt || '').getTime())
     .slice(0, 5);
 
   return (
-    <div className="flex h-screen overflow-hidden scrollbar-hide">
+    <div className="flex h-screen overflow-hidden">
       <div className="flex-1 flex flex-col overflow-hidden">
         <main className="flex-1 overflow-y-auto p-6 bg-gray-50 dark:bg-gray-900">
           <motion.div
@@ -98,86 +72,39 @@ const AdminDashboard = () => {
           >
             <PageHeader 
               title="Admin Dashboard" 
-              description="Overview of your platform"
+              description="Comprehensive overview of platform performance and user activity"
             />
 
             {/* Stats Cards */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-              <Card>
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-sm font-medium text-muted-foreground">Total Users</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex items-center justify-between">
-                    <div className="text-2xl font-bold">{stats.totalUsers}</div>
-                    <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
-                      <Users size={20} />
-                    </div>
-                  </div>
-                  <div className="text-xs text-muted-foreground mt-2 flex items-center">
-                    <TrendingUp className="h-3.5 w-3.5 mr-1 text-green-500" />
-                    <span className="text-green-500 font-medium">+12%</span>
-                    <span className="ml-1">from last month</span>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-sm font-medium text-muted-foreground">Total Events</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex items-center justify-between">
-                    <div className="text-2xl font-bold">{stats.totalEvents}</div>
-                    <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
-                      <CalendarDays size={20} />
-                    </div>
-                  </div>
-                  <div className="text-xs text-muted-foreground mt-2 flex items-center">
-                    <TrendingUp className="h-3.5 w-3.5 mr-1 text-green-500" />
-                    <span className="text-green-500 font-medium">+8%</span>
-                    <span className="ml-1">from last month</span>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-sm font-medium text-muted-foreground">Bookings</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex items-center justify-between">
-                    <div className="text-2xl font-bold">{stats.totalBookings}</div>
-                    <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
-                      <BookCheck size={20} />
-                    </div>
-                  </div>
-                  <div className="text-xs text-muted-foreground mt-2 flex items-center">
-                    <TrendingUp className="h-3.5 w-3.5 mr-1 text-green-500" />
-                    <span className="text-green-500 font-medium">+24%</span>
-                    <span className="ml-1">from last month</span>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-sm font-medium text-muted-foreground">Total Revenue</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex items-center justify-between">
-                    <div className="text-2xl font-bold">${stats.totalRevenue.toFixed(2)}</div>
-                    <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
-                      <DollarSign size={20} />
-                    </div>
-                  </div>
-                  <div className="text-xs text-muted-foreground mt-2 flex items-center">
-                    <TrendingUp className="h-3.5 w-3.5 mr-1 text-green-500" />
-                    <span className="text-green-500 font-medium">+18%</span>
-                    <span className="ml-1">from last month</span>
-                  </div>
-                </CardContent>
-              </Card>
+              <StatsCard
+                title="Total Users"
+                value={stats.totalUsers}
+                icon={<Users size={20} />}
+                trendPercentage={12}
+                trendDescription="from last month"
+              />
+              <StatsCard
+                title="Total Events"
+                value={stats.totalEvents}
+                icon={<CalendarDays size={20} />}
+                trendPercentage={8}
+                trendDescription="from last month"
+              />
+              <StatsCard
+                title="Bookings"
+                value={stats.totalBookings}
+                icon={<BookCheck size={20} />}
+                trendPercentage={24}
+                trendDescription="from last month"
+              />
+              <StatsCard
+                title="Total Revenue"
+                value={`$${stats.totalRevenue.toFixed(2)}`}
+                icon={<DollarSign size={20} />}
+                trendPercentage={18}
+                trendDescription="from last month"
+              />
             </div>
 
             {/* Main dashboard content */}
@@ -189,223 +116,100 @@ const AdminDashboard = () => {
                   <CardDescription>Revenue trend over the past 12 months</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <DashboardChart data={ []} />
+                  <DashboardChart data={[]} />
                 </CardContent>
               </Card>
 
               {/* Recent Events */}
-              <Card className="col-span-1">
-                <CardHeader>
-                  <CardTitle className="flex items-center">
-                    <CalendarDays className="mr-2 h-5 w-5" />
-                    Recent Events
-                  </CardTitle>
-                  <CardDescription>Latest events on the platform</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  {isLoadingEvents ? (
-                    <div className="text-center py-4">Loading events...</div>
-                  ) : (
-                    <Table>
-                      <TableHeader>
-                        <TableRow>
-                          <TableHead>Event</TableHead>
-                          <TableHead>Date</TableHead>
-                          <TableHead>Price</TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {recentEvents.length === 0 ? (
-                          <TableRow>
-                            <TableCell colSpan={3} className="text-center py-4 text-muted-foreground">
-                              No events found
-                            </TableCell>
-                          </TableRow>
-                        ) : (
-                          recentEvents.map((event) => (
-                            <TableRow key={event.id}>
-                              <TableCell className="font-medium">
-                                <Link to={`/admin/events/${event.id}`} className="hover:underline">
-                                  {event.title}
-                                </Link>
-                              </TableCell>
-                              <TableCell>{new Date(event.date).toLocaleDateString()}</TableCell>
-                              <TableCell>${event.price.toFixed(2)}</TableCell>
-                            </TableRow>
-                          ))
-                        )}
-                      </TableBody>
-                    </Table>
-                  )}
-                  <div className="mt-4">
-                    <Link 
-                      to="/admin/events" 
-                      className="text-sm text-primary hover:underline inline-flex items-center"
-                    >
-                      View all events
-                      <ChevronRight className="ml-1 h-4 w-4" />
-                    </Link>
-                  </div>
-                </CardContent>
-              </Card>
+              <DataTableCard
+                title="Recent Events"
+                icon={<CalendarDays className="h-5 w-5" />}
+                description="Latest events on the platform"
+                viewAllLink="/admin/events"
+                viewAllText="View all events"
+                isLoading={isLoadingEvents}
+                isEmpty={recentEvents.length === 0}
+              >
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Event</TableHead>
+                    <TableHead>Date</TableHead>
+                    <TableHead>Price</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {recentEvents.map((event) => (
+                    <TableRow key={event.id}>
+                      <TableCell className="font-medium">
+                        <Link 
+                          to={`/admin/events/${event.id}`} 
+                          className="hover:underline"
+                          aria-label={`View details for ${event.title}`}
+                        >
+                          {event.title}
+                        </Link>
+                      </TableCell>
+                      <TableCell>{new Date(event.date).toLocaleDateString()}</TableCell>
+                      <TableCell>${event.price.toFixed(2)}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </DataTableCard>
 
               {/* Recent Users */}
-              <Card className="col-span-1">
-                <CardHeader>
-                  <CardTitle className="flex items-center">
-                    <Users className="mr-2 h-5 w-5" />
-                    Recent Users
-                  </CardTitle>
-                  <CardDescription>Latest user registrations</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  {isLoadingUsers ? (
-                    <div className="text-center py-4">Loading users...</div>
-                  ) : (
-                    <Table>
-                      <TableHeader>
-                        <TableRow>
-                          <TableHead>Name</TableHead>
-                          <TableHead>Email</TableHead>
-                          <TableHead>Role</TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {recentUsers.length === 0 ? (
-                          <TableRow>
-                            <TableCell colSpan={3} className="text-center py-4 text-muted-foreground">
-                              No users found
-                            </TableCell>
-                          </TableRow>
-                        ) : (
-                          recentUsers.map((user) => (
-                            <TableRow key={user.id}>
-                              <TableCell className="font-medium">
-                                <Link to={`/admin/users`} className="hover:underline">
-                                  {user.name}
-                                </Link>
-                              </TableCell>
-                              <TableCell>{user.email}</TableCell>
-                              <TableCell>
-                                <Badge variant={user.role === UserRole.ADMIN ? "default" : 
-                                                user.role === UserRole.ORGANIZER ? "outline" : "secondary"}>
-                                  {user.role}
-                                </Badge>
-                              </TableCell>
-                            </TableRow>
-                          ))
-                        )}
-                      </TableBody>
-                    </Table>
-                  )}
-                  <div className="mt-4">
-                    <Link 
-                      to="/admin/users" 
-                      className="text-sm text-primary hover:underline inline-flex items-center"
-                    >
-                      View all users
-                      <ChevronRight className="ml-1 h-4 w-4" />
-                    </Link>
-                  </div>
-                </CardContent>
-              </Card>
+              <DataTableCard
+                title="Recent Users"
+                icon={<Users className="h-5 w-5" />}
+                description="Latest user registrations"
+                viewAllLink="/admin/users"
+                viewAllText="View all users"
+                isLoading={isLoadingUsers}
+                isEmpty={recentUsers.length === 0}
+              >
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Name</TableHead>
+                    <TableHead>Email</TableHead>
+                    <TableHead>Role</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {recentUsers.map((user) => (
+                    <TableRow key={user.id}>
+                      <TableCell className="font-medium">
+                        <Link 
+                          to="/admin/users" 
+                          className="hover:underline"
+                          aria-label={`View user ${user.name}`}
+                        >
+                          {user.name}
+                        </Link>
+                      </TableCell>
+                      <TableCell>{user.email}</TableCell>
+                      <TableCell>
+                        <Badge 
+                          variant={user.role === UserRole.ADMIN ? "default" : 
+                                  user.role === UserRole.ORGANIZER ? "outline" : "secondary"}
+                          aria-label={`User role: ${user.role}`}
+                        >
+                          {user.role}
+                        </Badge>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </DataTableCard>
 
               {/* User Distribution */}
-              <Card className="col-span-1">
-                <CardHeader>
-                  <CardTitle className="flex items-center">
-                    <Users className="mr-2 h-5 w-5" />
-                    User Distribution
-                  </CardTitle>
-                  <CardDescription>Breakdown of users by role</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    <div>
-                      <div className="flex items-center justify-between mb-1">
-                        <div className="text-sm font-medium">Admins</div>
-                        <div className="text-sm text-muted-foreground">{usersByRole.admin}</div>
-                      </div>
-                      <div className="h-2 rounded-full bg-gray-200 dark:bg-gray-800">
-                        <div 
-                          className="h-2 rounded-full bg-red-500" 
-                          style={{ width: `${(usersByRole.admin / stats.totalUsers) * 100}%` }}
-                        />
-                      </div>
-                    </div>
-                    <div>
-                      <div className="flex items-center justify-between mb-1">
-                        <div className="text-sm font-medium">Organizers</div>
-                        <div className="text-sm text-muted-foreground">{usersByRole.organizer}</div>
-                      </div>
-                      <div className="h-2 rounded-full bg-gray-200 dark:bg-gray-800">
-                        <div 
-                          className="h-2 rounded-full bg-blue-500" 
-                          style={{ width: `${(usersByRole.organizer / stats.totalUsers) * 100}%` }}
-                        />
-                      </div>
-                    </div>
-                    <div>
-                      <div className="flex items-center justify-between mb-1">
-                        <div className="text-sm font-medium">Users</div>
-                        <div className="text-sm text-muted-foreground">{usersByRole.user}</div>
-                      </div>
-                      <div className="h-2 rounded-full bg-gray-200 dark:bg-gray-800">
-                        <div 
-                          className="h-2 rounded-full bg-green-500" 
-                          style={{ width: `${(usersByRole.user / stats.totalUsers) * 100}%` }}
-                        />
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+              <UserDistributionCard
+                adminCount={usersByRole.admin}
+                organizerCount={usersByRole.organizer}
+                userCount={usersByRole.user}
+                totalUsers={stats.totalUsers}
+              />
 
               {/* Recent Activity */}
-              <Card className="col-span-1">
-                <CardHeader>
-                  <CardTitle className="flex items-center">
-                    <Activity className="mr-2 h-5 w-5" />
-                    Recent Activity
-                  </CardTitle>
-                  <CardDescription>Latest platform activities</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    {/* Example activity feed - would be replaced with real data */}
-                    <div className="flex items-start space-x-4">
-                      <div className="h-9 w-9 rounded-full bg-primary/10 flex items-center justify-center text-primary shrink-0">
-                        <Users size={16} />
-                      </div>
-                      <div>
-                        <p className="text-sm font-medium">New user registered</p>
-                        <p className="text-xs text-muted-foreground">Sarah Johnson joined as Organizer</p>
-                        <p className="text-xs text-muted-foreground">2 hours ago</p>
-                      </div>
-                    </div>
-                    <div className="flex items-start space-x-4">
-                      <div className="h-9 w-9 rounded-full bg-primary/10 flex items-center justify-center text-primary shrink-0">
-                        <CalendarDays size={16} />
-                      </div>
-                      <div>
-                        <p className="text-sm font-medium">New event created</p>
-                        <p className="text-xs text-muted-foreground">Tech Conference 2023 was added</p>
-                        <p className="text-xs text-muted-foreground">5 hours ago</p>
-                      </div>
-                    </div>
-                    <div className="flex items-start space-x-4">
-                      <div className="h-9 w-9 rounded-full bg-primary/10 flex items-center justify-center text-primary shrink-0">
-                        <BookCheck size={16} />
-                      </div>
-                      <div>
-                        <p className="text-sm font-medium">New booking</p>
-                        <p className="text-xs text-muted-foreground">5 tickets purchased for Music Festival</p>
-                        <p className="text-xs text-muted-foreground">8 hours ago</p>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+              <RecentActivityCard />
             </div>
           </motion.div>
         </main>
