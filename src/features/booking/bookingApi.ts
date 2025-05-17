@@ -56,19 +56,52 @@ export const bookingApi = createApi({
     getUserBookings: builder.query<Booking[], string>({
       async queryFn(userId) {
         try {
+          if (!userId) {
+            return { data: [] };
+          }
+          
           const bookingsRef = collection(db, "bookings");
-          const q = query(
-            bookingsRef,
-            where("userId", "==", userId),
-            orderBy("bookedAt", "desc")
-          );
-          const querySnapshot = await getDocs(q);
-          const bookings = querySnapshot.docs.map((doc) => ({
-            id: doc.id,
-            ...doc.data(),
-          })) as Booking[];
-          return { data: bookings };
+          
+          try {
+            // First try with compound query (requires index)
+            const q = query(
+              bookingsRef,
+              where("userId", "==", userId),
+              orderBy("bookedAt", "desc")
+            );
+            
+            const querySnapshot = await getDocs(q);
+            const bookings = querySnapshot.docs.map((doc) => ({
+              id: doc.id,
+              ...doc.data(),
+            })) as Booking[];
+            
+            return { data: bookings };
+          } catch (indexError: unknown) {
+            if ((indexError as { code: string }).code === 'failed-precondition') {
+              // Fall back to simple query if index is missing
+              const simpleQ = query(
+                bookingsRef,
+                where("userId", "==", userId)
+              );
+              
+              const querySnapshot = await getDocs(simpleQ);
+              const bookings = querySnapshot.docs.map((doc) => ({
+                id: doc.id,
+                ...doc.data(),
+              })) as Booking[];
+              
+              // Sort manually in memory
+              bookings.sort((a, b) => 
+                new Date(b.bookedAt).getTime() - new Date(a.bookedAt).getTime()
+              );
+              
+              return { data: bookings };
+            }
+            throw indexError;
+          }
         } catch (error) {
+          console.error('Error fetching bookings:', error);
           return handleError(error);
         }
       },
