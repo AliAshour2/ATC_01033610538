@@ -41,7 +41,7 @@ import {
 import toast from "react-hot-toast";
 import { format } from "date-fns";
 import { Link } from "react-router-dom";
-import type { EventFormValues } from "@/components/admin/EventForm";
+import type { EventFormSubmitValues } from "@/components/admin/EventForm";
 
 const AdminEvents: FC = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -78,7 +78,7 @@ const AdminEvents: FC = () => {
     setIsDeleteDialogOpen(true);
   };
 
-  const handleCreateEvent = async (data: EventFormValues) => {
+  const handleCreateEvent = async (data: EventFormSubmitValues) => {
     try {
       await createEvent({
         title: data.title,
@@ -89,12 +89,8 @@ const AdminEvents: FC = () => {
         price: data.price,
         category: data.category,
         imageUrl: data.imageUrl,
-        tags: Array.isArray(data.tags)
-          ? data.tags
-          : data.tags
-          ? [data.tags]
-          : [],
-        organizerId: data.organizerId || "admin", // Default value, would be replaced with current user ID in a real app
+        tags: data.tags,
+        organizerId: "admin", // Default value, would be replaced with current user ID in a real app
       }).unwrap();
       setIsCreateModalOpen(false);
       toast.success("Event created successfully");
@@ -105,7 +101,7 @@ const AdminEvents: FC = () => {
     }
   };
 
-  const handleUpdateEvent = async (data: EventFormValues) => {
+  const handleUpdateEvent = async (data: EventFormSubmitValues) => {
     if (!selectedEvent) return;
 
     try {
@@ -120,11 +116,7 @@ const AdminEvents: FC = () => {
           price: data.price,
           category: data.category,
           imageUrl: data.imageUrl,
-          tags: Array.isArray(data.tags)
-            ? data.tags
-            : data.tags
-            ? [data.tags]
-            : [],
+          tags: data.tags,
         },
       }).unwrap();
       setIsEditModalOpen(false);

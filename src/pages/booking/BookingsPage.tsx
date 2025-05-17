@@ -14,7 +14,7 @@ import toast from "react-hot-toast";
 const BookingsPage = () => {
   const navigate = useNavigate();
   const { data: authState } = useGetAuthStateQuery();
-  const { data: userBookings, isLoading: bookingsLoading, refetch, error } = useGetUserBookingsQuery(
+  const { data: userBookings, isLoading: bookingsLoading, refetch } = useGetUserBookingsQuery(
     authState?.id || "", 
     { skip: !authState }
   );
