@@ -1,0 +1,51 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isAdmin() {
+      return isAuthenticated() && 
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'ADMIN';
+    }
+    
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    // User rules
+    match /users/{userId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated();
+      allow update, delete: if isAdmin() || isOwner(userId);
+    }
+
+    // Booking rules
+    match /bookings/{bookingId} {
+      allow read: if isAuthenticated() && (
+        isAdmin() || 
+        request.auth.uid == resource.data.userId
+      );
+      allow create: if isAuthenticated();
+      allow update: if isAuthenticated() && (
+        isAdmin() || 
+        (request.auth.uid == resource.data.userId && 
+         resource.data.status == "confirmed")
+      );
+      allow delete: if isAdmin();
+    }
+
+    // Event rules
+    match /events/{eventId} {
+      allow read: if true;
+      allow create: if isAuthenticated() && (isAdmin() || request.resource.data.organizerId == request.auth.uid);
+      allow update, delete: if isAuthenticated() && (
+        isAdmin() || 
+        resource.data.organizerId == request.auth.uid
+      );
+    }
+  }
+}
