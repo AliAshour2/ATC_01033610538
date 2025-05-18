@@ -2,61 +2,85 @@
 
 A modern event management platform built with React, TypeScript, and Firebase.
 
+🌐 **Live Site:** [https://eventech.vercel.app](https://eventech.vercel.app)
+
+## Demo Credentials
+
+Try out the app using the following demo accounts:
+
+* **Admin Account**
+
+  * Email: `admin@gmail.com`
+  * Password: `admin@gmail.com`
+
+* **User Account**
+
+  * Email: `user@gmail.com`
+  * Password: `user@gmail.com`
+
+
+
 ## Features
 
-- 🔐 User Authentication & Authorization
-- 👥 User Role Management (Admin/User)
-- 📅 Event Creation and Management
-- 🎟️ Booking System
-- 📊 Admin Dashboard with Analytics
-- 💳 Payment Processing
-- 📱 Responsive Design
-- 🌓 Dark/Light Theme Support
+* 🔐 User Authentication & Authorization
+* 👥 User Role Management (Admin/User)
+* 📅 Event Creation and Management
+* 🎟️ Booking System
+* 📊 Admin Dashboard with Analytics
+* 💳 Payment Processing
+* 📱 Responsive Design
+* 🌓 Dark/Light Theme Support
 
 ## Tech Stack
 
-- **Frontend:**
-  - React 19
-  - TypeScript
-  - Redux Toolkit
-  - React Router v7
-  - Tailwind CSS
-  - Framer Motion
-  - Lucide Icons
+* **Frontend:**
 
-- **Backend:**
-  - Firebase Authentication
-  - Firebase Firestore
-  - Firebase Storage
+  * React 19
+  * TypeScript
+  * Redux Toolkit
+  * React Router v7
+  * Tailwind CSS
+  * Framer Motion
+  * Lucide Icons
 
-- **Development Tools:**
-  - Vite
-  - ESLint
-  - Jest/Vitest
-  - MSW (Mock Service Worker)
+* **Backend:**
+
+  * Firebase Authentication
+  * Firebase Firestore
+  * Firebase Storage
+
+* **Development Tools:**
+
+  * Vite
+  * ESLint
+  * Jest/Vitest
+  * MSW (Mock Service Worker)
 
 ## Getting Started
 
 ### Prerequisites
 
-- Node.js (v18 or higher)
-- npm or yarn
-- Firebase account
+* Node.js (v18 or higher)
+* npm or yarn
+* Firebase account
 
 ### Installation
 
 1. Clone the repository
+
 ```bash
 git clone https://github.com/aliashour2/eventech.git
 cd eventech
 ```
 
 2. Install dependencies
+
 ```bash
 npm install
 ```
 
 3. Create a `.env` file in the root directory and add your Firebase configuration
+
 ```env
 VITE_FIREBASE_API_KEY=your-api-key
 VITE_FIREBASE_AUTH_DOMAIN=your-auth-domain
@@ -68,18 +92,19 @@ VITE_FIREBASE_MEASUREMENT_ID=your-measurement-id
 ```
 
 4. Start the development server
+
 ```bash
 npm run dev
 ```
 
 ### Scripts
 
-- `npm run dev` - Start development server
-- `npm run build` - Build for production
-- `npm run preview` - Preview production build
-- `npm run test` - Run tests
-- `npm run lint` - Run ESLint
-- `npm run seed` - Seed sample data
+* `npm run dev` - Start development server
+* `npm run build` - Build for production
+* `npm run preview` - Preview production build
+* `npm run test` - Run tests
+* `npm run lint` - Run ESLint
+* `npm run seed` - Seed sample data
 
 ## Project Structure
 
@@ -96,28 +121,33 @@ eventech/
 │   ├── types/        # TypeScript type definitions
 │   └── utils/        # Utility functions
 ├── public/           # Static assets
-└── scripts/         # Build and setup scripts
+└── scripts/          # Build and setup scripts
 ```
 
 ## Features in Detail
 
 ### User Management
-- User registration and authentication
-- Role-based access control (Admin/User)
-- Profile management
+
+* User registration and authentication
+* Role-based access control (Admin/User)
+* Profile management
 
 ### Event Management
-- Create and manage events
-- Event categories and tags
-- Event search and filtering
-- Event booking system
+
+* Create and manage events
+* Event categories and tags
+* Event search and filtering
+* Event booking system
 
 ### Admin Dashboard
-- User analytics
-- Booking statistics
-- Revenue tracking
-- Event management
-- User management
+
+* User analytics
+* Booking statistics
+* Revenue tracking
+* Event management
+* User management
+
+
 
 ## Contributing
 
@@ -130,3 +160,5 @@ eventech/
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+
