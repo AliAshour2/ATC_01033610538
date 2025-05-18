@@ -46,9 +46,9 @@ import {
 } from "@/features/booking/bookingApi";
 import { useGetEventsQuery } from "@/features/events/eventApi";
 import { useGetUsersQuery } from "@/features/user/userApi";
-import { DeleteBookingDialog } from "@/components/admin/DeleteBookingDialog";
-import { BookingStatusDialog } from "@/components/admin/BookingStatusDialog";
-import { CheckInDialog } from "@/components/admin/CheckInDialog";
+import { DeleteBookingDialog } from "@/components/admin/admin_bookings/DeleteBookingDialog";
+import { BookingStatusDialog } from "@/components/admin/admin_bookings/BookingStatusDialog";
+import { CheckInDialog } from "@/components/admin/admin_checkout/CheckInDialog";
 import toast from "react-hot-toast";
 import type { User, Event } from "@/types";
 

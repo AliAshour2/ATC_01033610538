@@ -18,8 +18,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { UserModal } from "@/components/admin/UserModal";
-import { DeleteUserDialog } from "@/components/admin/DeleteUserDialog";
+import { UserModal } from "@/components/admin/admin_user/UserModal";
+import { DeleteUserDialog } from "@/components/admin/admin_user/DeleteUserDialog";
 import { UserRole, type User, type UserFormData } from "@/types";
 import { Edit, MoreHorizontal, Search, Trash, UserPlus } from "lucide-react";
 import type { FC } from "react";

@@ -18,8 +18,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { EventModal } from "@/components/admin/EventModal";
-import { DeleteEventDialog } from "@/components/admin/DeleteEventDialog";
+import { EventModal } from "@/components/admin/admin_events/EventModal";
+import { DeleteEventDialog } from "@/components/admin/admin_events/DeleteEventDialog";
 
 import type { Event } from "@/types";
 import {
@@ -41,7 +41,7 @@ import {
 import toast from "react-hot-toast";
 import { format } from "date-fns";
 import { Link } from "react-router-dom";
-import type { EventFormSubmitValues } from "@/components/admin/EventForm";
+import type { EventFormSubmitValues } from "@/components/admin/admin_events/EventForm";
 
 const AdminEvents: FC = () => {
   const [searchQuery, setSearchQuery] = useState("");
