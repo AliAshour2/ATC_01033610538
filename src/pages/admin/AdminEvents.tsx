@@ -30,6 +30,8 @@ import {
   PlusCircle,
   Search,
   Trash,
+  Filter,
+  RefreshCw,
 } from "lucide-react";
 import type { FC } from "react";
 import {
@@ -42,6 +44,7 @@ import toast from "react-hot-toast";
 import { format } from "date-fns";
 import { Link } from "react-router-dom";
 import type { EventFormSubmitValues } from "@/components/admin/admin_events/EventForm";
+import AdminEventTableSkeleton from "@/components/skeletons/AdminEventTableSkeleton";
 
 const AdminEvents: FC = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -150,49 +153,82 @@ const AdminEvents: FC = () => {
   };
 
   return (
-    <div>
+    <div className="space-y-8 pb-10">
       <PageHeader
-        title="Event Management"
+        title={
+          <span className="bg-gradient-to-r from-primary-500 to-secondary-500 bg-clip-text text-transparent">
+            Event Management
+          </span>
+        }
         description="Create and manage events on your platform"
       />
 
-      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-        <div className="flex justify-between items-center mb-6">
-          <div className="relative max-w-sm">
-            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }} 
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3 }}
+        className="space-y-6"
+      >
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <div className="relative w-full max-w-md">
+            <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+              <Search className="h-4 w-4 text-muted-foreground z-10" />
+            </div>
             <Input
               placeholder="Search events..."
-              className="pl-8"
+              className="pl-10 w-full bg-background/50 backdrop-blur-sm border-border/50 focus-visible:ring-primary-500"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
-          <Button
-            onClick={handleOpenCreateModal}
-            className="flex items-center gap-2"
-          >
-            <PlusCircle className="h-4 w-4" />
-            <span className="hidden md:inline">Add Event</span>
-          </Button>
+          <div className="flex items-center gap-3 w-full sm:w-auto">
+            <Button
+              variant="outline"
+              size="icon"
+              className="h-10 w-10 rounded-full border-border/50 bg-background/50 backdrop-blur-sm hover:bg-background/80"
+            >
+              <Filter className="h-4 w-4" />
+              <span className="sr-only">Filter</span>
+            </Button>
+            <Button
+              variant="outline"
+              size="icon"
+              className="h-10 w-10 rounded-full border-border/50 bg-background/50 backdrop-blur-sm hover:bg-background/80"
+            >
+              <RefreshCw className="h-4 w-4" />
+              <span className="sr-only">Refresh</span>
+            </Button>
+            <Button
+              onClick={handleOpenCreateModal}
+              className="flex items-center gap-2 bg-primary-500 hover:bg-primary-600 text-white shadow-md hover:shadow-lg transition-all duration-200"
+            >
+              <PlusCircle className="h-4 w-4" />
+              <span className="hidden sm:inline">Add Event</span>
+            </Button>
+          </div>
         </div>
 
-        <div className="bg-white dark:bg-gray-950 rounded-lg border border-gray-200 dark:border-gray-800 overflow-hidden">
+        <div className="bg-background/50 backdrop-blur-sm rounded-xl border border-border/50 shadow-soft overflow-hidden">
           {isLoadingEvents ? (
-            <div className="p-8 text-center">
-              <div className="animate-pulse">Loading events...</div>
-            </div>
+            // <div className="p-12 text-center">
+            //   <div className="inline-block p-3 rounded-full bg-primary-100 dark:bg-primary-900/30 mb-4">
+            //     <RefreshCw className="h-6 w-6 text-primary-500 animate-spin" />
+            //   </div>
+            //   <p className="text-muted-foreground font-medium">Loading events...</p>
+            // </div>
+            <AdminEventTableSkeleton/>
           ) : (
             <div className="overflow-x-auto">
               <Table>
                 <TableHeader>
-                  <TableRow>
-                    <TableHead>Event</TableHead>
-                    <TableHead>Date</TableHead>
-                    <TableHead>Location</TableHead>
-                    <TableHead>Category</TableHead>
-                    <TableHead>Capacity</TableHead>
-                    <TableHead>Price</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
+                  <TableRow className="bg-muted/50 hover:bg-muted/50">
+                    <TableHead className="font-semibold">Event</TableHead>
+                    <TableHead className="font-semibold">Date</TableHead>
+                    <TableHead className="font-semibold">Location</TableHead>
+                    <TableHead className="font-semibold">Category</TableHead>
+                    <TableHead className="font-semibold">Capacity</TableHead>
+                    <TableHead className="font-semibold">Price</TableHead>
+                    <TableHead className="text-right font-semibold">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -200,35 +236,44 @@ const AdminEvents: FC = () => {
                     <TableRow>
                       <TableCell
                         colSpan={7}
-                        className="text-center py-8 text-muted-foreground"
+                        className="text-center py-12 text-muted-foreground"
                       >
-                        No events found
+                        <div className="flex flex-col items-center justify-center gap-2">
+                          <div className="p-3 rounded-full bg-muted/50">
+                            <Search className="h-6 w-6 text-muted-foreground" />
+                          </div>
+                          <p className="font-medium">No events found</p>
+                          <p className="text-sm text-muted-foreground">Try adjusting your search query</p>
+                        </div>
                       </TableCell>
                     </TableRow>
                   ) : (
                     filteredEvents.map((event) => (
-                      <TableRow key={event.id}>
+                      <TableRow 
+                        key={event.id}
+                        className="group hover:bg-muted/30 transition-colors duration-150"
+                      >
                         <TableCell className="font-medium">
                           <div className="flex items-center gap-3">
                             {event.imageUrl && (
                               <img
                                 src={event.imageUrl}
                                 alt={event.title}
-                                className="h-10 w-20 rounded object-cover"
+                                className="h-12 w-20 rounded-md object-cover ring-1 ring-border/50 group-hover:ring-primary-300 dark:group-hover:ring-primary-700 transition-all duration-200"
                                 onError={(e) =>
                                   (e.currentTarget.src = "/placeholder.jpg")
                                 }
                               />
                             )}
                             <div>
-                              <div>{event.title}</div>
+                              <div className="font-semibold text-foreground group-hover:text-primary-500 transition-colors duration-150">{event.title}</div>
                               {event.tags && event.tags.length > 0 && (
-                                <div className="flex gap-1 mt-1">
+                                <div className="flex flex-wrap gap-1 mt-1">
                                   {event.tags.slice(0, 3).map((tag, index) => (
                                     <Badge
                                       key={index}
                                       variant="outline"
-                                      className="text-xs"
+                                      className="text-xs px-1.5 py-0 h-5 bg-background/80 border-border/50 text-muted-foreground hover:text-foreground transition-colors duration-150"
                                     >
                                       {tag}
                                     </Badge>
@@ -236,7 +281,7 @@ const AdminEvents: FC = () => {
                                   {event.tags.length > 3 && (
                                     <Badge
                                       variant="outline"
-                                      className="text-xs"
+                                      className="text-xs px-1.5 py-0 h-5 bg-background/80 border-border/50 text-muted-foreground hover:text-foreground transition-colors duration-150"
                                     >
                                       +{event.tags.length - 3}
                                     </Badge>
@@ -247,26 +292,28 @@ const AdminEvents: FC = () => {
                           </div>
                         </TableCell>
                         <TableCell>
-                          <div className="flex items-center gap-2">
-                            <Calendar className="h-4 w-4 text-muted-foreground" />
+                          <div className="flex items-center gap-2 text-muted-foreground group-hover:text-foreground transition-colors duration-150">
+                            <Calendar className="h-4 w-4 text-primary-400" />
                             {format(new Date(event.date), "MMM dd, yyyy")}
                           </div>
                         </TableCell>
-                        <TableCell>{event.location}</TableCell>
+                        <TableCell className="text-muted-foreground group-hover:text-foreground transition-colors duration-150">{event.location}</TableCell>
                         <TableCell>
                           {event.category && (
-                            <Badge variant="secondary">{event.category}</Badge>
+                            <Badge variant="secondary" className="bg-secondary-100 dark:bg-secondary-900/30 text-secondary-700 dark:text-secondary-300 hover:bg-secondary-200 dark:hover:bg-secondary-800/50 transition-colors duration-150">
+                              {event.category}
+                            </Badge>
                           )}
                         </TableCell>
-                        <TableCell>{event.capacity}</TableCell>
-                        <TableCell>{formatCurrency(event.price)}</TableCell>
+                        <TableCell className="text-muted-foreground group-hover:text-foreground transition-colors duration-150">{event.capacity}</TableCell>
+                        <TableCell className="font-medium text-muted-foreground group-hover:text-foreground transition-colors duration-150">{formatCurrency(event.price)}</TableCell>
                         <TableCell className="text-right">
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                               <Button
                                 variant="ghost"
                                 size="icon"
-                                className="text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-800"
+                                className="h-8 w-8 rounded-full text-muted-foreground hover:text-foreground hover:bg-muted/50"
                               >
                                 <MoreHorizontal className="h-4 w-4" />
                                 <span className="sr-only">Actions</span>
@@ -274,32 +321,32 @@ const AdminEvents: FC = () => {
                             </DropdownMenuTrigger>
                             <DropdownMenuContent
                               align="end"
-                              className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-lg rounded-md min-w-[150px]"
+                              className="w-48 p-1.5 bg-background/95 backdrop-blur-sm border border-border/50 shadow-lg rounded-lg"
                             >
                               <DropdownMenuItem
                                 asChild
-                                className="text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 focus:bg-gray-100 dark:focus:bg-gray-700"
+                                className="flex items-center rounded-md px-2 py-2 text-sm cursor-pointer hover:bg-muted/80 focus:bg-muted/80 transition-colors duration-150"
                               >
                                 <Link
                                   to={`/events/${event.id}`}
-                                  className="flex items-center w-full cursor-pointer px-2 py-1.5 text-sm"
+                                  className="flex items-center w-full"
                                 >
-                                  <EyeIcon className="mr-2 h-4 w-4 text-gray-500 dark:text-gray-400" />
+                                  <EyeIcon className="mr-2 h-4 w-4 text-muted-foreground" />
                                   View
                                 </Link>
                               </DropdownMenuItem>
 
                               <DropdownMenuItem
                                 onClick={() => handleOpenEditModal(event)}
-                                className="text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 focus:bg-gray-100 dark:focus:bg-gray-700"
+                                className="flex items-center rounded-md px-2 py-2 text-sm cursor-pointer hover:bg-muted/80 focus:bg-muted/80 transition-colors duration-150"
                               >
-                                <Edit className="mr-2 h-4 w-4 text-gray-500 dark:text-gray-400" />
+                                <Edit className="mr-2 h-4 w-4 text-muted-foreground" />
                                 Edit
                               </DropdownMenuItem>
 
                               <DropdownMenuItem
                                 onClick={() => handleOpenDeleteDialog(event)}
-                                className="text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 focus:bg-red-50 dark:focus:bg-red-900/30"
+                                className="flex items-center rounded-md px-2 py-2 text-sm cursor-pointer text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 focus:bg-red-50 dark:focus:bg-red-900/20 transition-colors duration-150"
                               >
                                 <Trash className="mr-2 h-4 w-4" />
                                 Delete
