@@ -1,5 +1,5 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Activity, Users, CalendarDays, BookCheck } from "lucide-react";
+import { Activity, BookCheck, CalendarDays, Users } from "lucide-react";
 
 type ActivityItem = {
   id: string;
@@ -35,25 +35,30 @@ const activityItems: ActivityItem[] = [
 
 export const RecentActivityCard = () => {
   return (
-    <Card className="h-full">
-      <CardHeader>
-        <CardTitle className="flex items-center">
-          <Activity className="mr-2 h-5 w-5" />
+    <Card className="h-full transition-all duration-300 hover:shadow-md border-none bg-white/70 dark:bg-gray-900/70 backdrop-blur-sm">
+      <CardHeader className="pb-2">
+        <CardTitle className="flex items-center text-lg font-semibold text-gray-800 dark:text-white">
+          <Activity className="mr-2 h-5 w-5 text-primary" />
           Recent Activity
         </CardTitle>
-        <CardDescription>Latest platform activities</CardDescription>
+        <CardDescription className="text-sm text-gray-500 dark:text-gray-400">
+          Latest platform activities
+        </CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="space-y-4">
-          {activityItems.map((item) => (
-            <div key={item.id} className="flex items-start space-x-4">
-              <div className="h-9 w-9 rounded-full bg-primary/10 flex items-center justify-center text-primary shrink-0">
+        <div className="space-y-3">
+          {activityItems.map((item,) => (
+            <div
+              key={item.id}
+              className="flex items-start space-x-3 p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors group"
+            >
+              <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center text-primary shrink-0 group-hover:scale-105 transition-transform duration-200">
                 {item.icon}
               </div>
-              <div>
-                <p className="text-sm font-medium">{item.title}</p>
-                <p className="text-xs text-muted-foreground">{item.description}</p>
-                <p className="text-xs text-muted-foreground">{item.time}</p>
+              <div className="min-w-0 flex-1">
+                <p className="text-sm font-medium text-gray-800 dark:text-gray-200 truncate">{item.title}</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400 line-clamp-1">{item.description}</p>
+                <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">{item.time}</p>
               </div>
             </div>
           ))}
